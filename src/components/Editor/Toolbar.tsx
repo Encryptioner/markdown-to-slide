@@ -6,6 +6,10 @@ interface ToolbarProps {
   onSave: () => void;
   onToggleStorage: () => void;
   onInsertSyntax: (syntax: string, wrap?: boolean) => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
   showStorage: boolean;
 }
 
@@ -13,6 +17,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onSave,
   onToggleStorage,
   onInsertSyntax,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
   showStorage
 }) => {
   const tools = [
@@ -44,6 +52,34 @@ const Toolbar: React.FC<ToolbarProps> = ({
       </div>
       
       <div className="flex items-center gap-2">
+        {onUndo && (
+          <button
+            onClick={onUndo}
+            disabled={!canUndo}
+            className={`px-3 py-1 text-sm rounded transition-colors ${
+              canUndo ? 'hover:bg-gray-200' : 'opacity-50 cursor-not-allowed'
+            }`}
+            title="Undo (Ctrl+Z)"
+          >
+            ↶
+          </button>
+        )}
+        
+        {onRedo && (
+          <button
+            onClick={onRedo}
+            disabled={!canRedo}
+            className={`px-3 py-1 text-sm rounded transition-colors ${
+              canRedo ? 'hover:bg-gray-200' : 'opacity-50 cursor-not-allowed'
+            }`}
+            title="Redo (Ctrl+Y)"
+          >
+            ↷
+          </button>
+        )}
+        
+        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+        
         <button
           onClick={onToggleStorage}
           className={`px-3 py-1 text-sm rounded transition-colors ${

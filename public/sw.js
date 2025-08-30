@@ -1,19 +1,26 @@
-const CACHE_NAME = 'markdown-slides-v1';
+const CACHE_NAME = 'markdown-slides-v2';
+const isProduction = self.location.hostname !== 'localhost';
+
+// Only cache essential files
 const urlsToCache = [
   '/',
-  '/manifest.json',
-  // Static assets will be cached automatically by Next.js
+  '/manifest.json'
 ];
 
-// Install event - cache static assets
+// Install event - cache only in production
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
+  if (isProduction) {
+    event.waitUntil(
+      caches.open(CACHE_NAME)
+        .then((cache) => {
+          console.log('Opened cache');
+          return cache.addAll(urlsToCache);
+        })
+        .catch((error) => {
+          console.log('Cache add failed:', error);
+        })
+    );
+  }
   self.skipWaiting();
 });
 
@@ -34,47 +41,66 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache with network fallback
+// Fetch event - handle requests carefully
 self.addEventListener('fetch', (event) => {
-  // Skip cross-origin requests and chrome-extension requests
-  if (!event.request.url.startsWith(self.location.origin) || 
-      event.request.url.startsWith('chrome-extension://')) {
+  const url = event.request.url;
+  
+  // Skip all problematic requests
+  if (!url.startsWith(self.location.origin) || 
+      url.startsWith('chrome-extension://') ||
+      url.includes('_next/webpack-hmr') ||
+      url.includes('__nextjs_original-stack-frames') ||
+      url.includes('hot-reload') ||
+      url.includes('.hot-update.') ||
+      event.request.method !== 'GET') {
     return;
   }
 
-  // Skip caching certain URLs
-  if (event.request.url.includes('_next/webpack-hmr') ||
-      event.request.url.includes('__nextjs_original-stack-frames')) {
+  // In development, skip caching for most requests
+  if (!isProduction) {
+    // Only handle offline fallback for navigation requests
+    if (event.request.destination === 'document') {
+      event.respondWith(
+        fetch(event.request).catch(() => {
+          return caches.match('/') || new Response('Offline', { 
+            status: 503, 
+            statusText: 'Service Unavailable' 
+          });
+        })
+      );
+    }
     return;
   }
 
+  // Production caching strategy
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request).then((fetchResponse) => {
-          // Only cache successful responses from same origin
-          if (fetchResponse.status === 200 && 
-              fetchResponse.type === 'basic' &&
-              event.request.url.startsWith(self.location.origin)) {
-            const responseToCache = fetchResponse.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              })
-              .catch((error) => {
-                console.log('Cache put failed:', error);
-              });
+        if (response) {
+          return response;
+        }
+        
+        return fetch(event.request).then((fetchResponse) => {
+          if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
+            return fetchResponse;
           }
+
+          const responseToCache = fetchResponse.clone();
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            })
+            .catch((error) => {
+              console.log('Cache put failed:', error);
+            });
+
           return fetchResponse;
         });
       })
       .catch(() => {
-        // Return offline page for navigation requests
         if (event.request.destination === 'document') {
           return caches.match('/');
         }
-        // Return a simple response for other failed requests
         return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
       })
   );

@@ -2,14 +2,14 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { Slide, SlideAttributes } from '@/types';
 
-export function parseMarkdownToSlides(markdown: string): Slide[] {
+export async function parseMarkdownToSlides(markdown: string): Promise<Slide[]> {
   if (!markdown.trim()) {
     return [{ id: '1', content: '<div class="slide-content"><h1>Welcome to Markdown to Slides</h1><p>Start writing your presentation in Markdown format.</p></div>' }];
   }
 
   const slides = markdown.split(/^---$/gm);
   
-  return slides.map((slideContent, index) => {
+  const slidePromises = slides.map(async (slideContent, index) => {
     const trimmedContent = slideContent.trim();
     if (!trimmedContent) return null;
 
@@ -20,7 +20,7 @@ export function parseMarkdownToSlides(markdown: string): Slide[] {
     const cleanContent = trimmedContent.replace(/<!--\s*\.slide:.*?-->/g, '').trim();
     
     // Convert markdown to HTML
-    const htmlContent = marked(cleanContent);
+    const htmlContent = await marked.parse(cleanContent);
     
     // Sanitize HTML
     const sanitizedContent = DOMPurify.sanitize(htmlContent);
@@ -30,7 +30,10 @@ export function parseMarkdownToSlides(markdown: string): Slide[] {
       content: `<div class="slide-content">${sanitizedContent}</div>`,
       attributes
     };
-  }).filter(Boolean) as Slide[];
+  });
+
+  const processedSlides = await Promise.all(slidePromises);
+  return processedSlides.filter(Boolean) as Slide[];
 }
 
 function extractSlideAttributes(content: string): SlideAttributes | undefined {

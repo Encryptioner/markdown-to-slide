@@ -1,7 +1,7 @@
 # Task 1: Initial Setup - Instructions
 
 ## General Rules
-1. Write or update the summary of your updates in `ai-summaries/task-1-initial-setup.md` file when all the commanded tasks/instructions are done. Keep it short. Add summary of key files changed (with what functionality is changed there). You may update it in chronological way by step 1, step 2 and so on. It should reflect the continuos changes done on the codebase.
+1. Assess summary of your earlier tasks in `ai-summaries/task-1-initial-setup.md` file. And write or update the summary of your updates in that file when all the current commanded tasks/instructions are done. Keep it short. Include summary of key files changed (with info on functionality changed). You may update it in chronological way by step 1, step 2 and so on. It should reflect the continuos changes done on the codebase.
 
 
 ## Instruction List 1
@@ -20,10 +20,12 @@
 2. You can do it some small steps for better handing of the project. But don't forget the goals
 
 ### Comments
-1. Added this command in middle `Always use pnpm for this project. Update whereve r npm is mentioned` when asked to run `npm` command
+1. Added this command in middle `Always use pnpm for this project. Update wherever npm is mentioned` when asked to run `npm` command
 
 
 ## Instruction List
+
+### Instructions
 1. Got this error while running `pnpm dev`. In browser, it is `Runtime error - self is not defined`
     ⚠ Unsupported metadata themeColor is configured in metadata export in /. Please move it to viewport export instead.
   Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
@@ -62,11 +64,13 @@
 4. The PDF export doesn't work correctly. It exports a blank page only
 5. Check the project overview and ensure it fulfill all the required features, goals, standards
 
-## Comments
+### Comments
 1. I don't see any reasonable improvement
 
 
 ## Instruction List 4
+
+### Instructions
 1. I don't see any color related update. Check earlier instructions and ensure everything is done
 2. There is error in console. Fix those
    sw.js:49 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
@@ -102,7 +106,7 @@
 3. Ensure the code is production ready. It can be deployed as github pages and can be used as PWA
 
 
-## Comments
+### Comments
 1. The colors are updated and looks mostly ok now
 2. The preview is good. However, the codes need to be shown with special care. It should look good in preview and full screen
 3. The load example have issues. It doesn't load example. On load example, the slide number should be reset to 1
@@ -113,5 +117,11 @@
 
 
 ## Instruction List 5
+
+### Instructions
 1. Continue your earlier tasks
 2. Check earlier comments and fix all issues
+
+### Comments
+1. It requires clearing cache/site data to see updated ui when running `pnpm dev`. Won't site refresh/hard reload fix that? How to see the updated view every time
+2. On running `pnpm dev`, getting this error `Cannot access 'refreshDocuments' before initialization`

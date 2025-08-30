@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { Slide, Document, PresentationSettings } from '@/types';
 import { parseMarkdownToSlides } from '@/utils/markdownParser';
-import { saveDocument, getStoredDocuments, deleteDocument } from '@/utils/storage';
+import { saveDocument, getStoredDocuments, deleteDocument, renameDocument } from '@/utils/storage';
 
 interface AppContextType {
   markdown: string;
@@ -21,6 +21,7 @@ interface AppContextType {
   saveCurrentDocument: (title: string) => void;
   loadDocument: (document: Document) => void;
   deleteStoredDocument: (id: string) => void;
+  renameStoredDocument: (id: string, newTitle: string) => boolean;
   refreshDocuments: () => void;
   updateSettings: (settings: Partial<PresentationSettings>) => void;
 }
@@ -40,9 +41,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     showSlideNumbers: true
   });
 
-  const setMarkdown = useCallback((newMarkdown: string) => {
+  const setMarkdown = useCallback(async (newMarkdown: string) => {
     setMarkdownState(newMarkdown);
-    const newSlides = parseMarkdownToSlides(newMarkdown);
+    const newSlides = await parseMarkdownToSlides(newMarkdown);
     setSlides(newSlides);
     
     // Reset to first slide if current slide index is out of bounds
@@ -69,11 +70,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const refreshDocuments = useCallback(() => {
+    setDocuments(getStoredDocuments().sort((a, b) => 
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    ));
+  }, []);
+
   const saveCurrentDocument = useCallback((title: string) => {
     const savedDoc = saveDocument(title, markdown);
     setCurrentDocument(savedDoc);
     refreshDocuments();
-  }, [markdown]);
+  }, [markdown, refreshDocuments]);
 
   const loadDocument = useCallback((document: Document) => {
     setCurrentDocument(document);
@@ -86,13 +93,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setCurrentDocument(null);
     }
     refreshDocuments();
-  }, [currentDocument]);
+  }, [currentDocument, refreshDocuments]);
 
-  const refreshDocuments = useCallback(() => {
-    setDocuments(getStoredDocuments().sort((a, b) => 
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    ));
-  }, []);
+  const renameStoredDocument = useCallback((id: string, newTitle: string) => {
+    const success = renameDocument(id, newTitle);
+    if (success) {
+      if (currentDocument?.id === id) {
+        setCurrentDocument(prev => prev ? { ...prev, title: newTitle } : null);
+      }
+      refreshDocuments();
+    }
+    return success;
+  }, [currentDocument, refreshDocuments]);
 
   const updateSettings = useCallback((newSettings: Partial<PresentationSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
@@ -100,9 +112,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Initialize slides and documents on mount
   React.useEffect(() => {
-    setSlides(parseMarkdownToSlides(markdown));
+    const initializeSlides = async () => {
+      const initialSlides = await parseMarkdownToSlides(markdown);
+      setSlides(initialSlides);
+    };
+    
+    initializeSlides();
     refreshDocuments();
-  }, [markdown, refreshDocuments]);
+  }, [refreshDocuments]);
 
   const value: AppContextType = {
     markdown,
@@ -118,6 +135,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     saveCurrentDocument,
     loadDocument,
     deleteStoredDocument,
+    renameStoredDocument,
     refreshDocuments,
     updateSettings
   };

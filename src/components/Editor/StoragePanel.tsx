@@ -9,8 +9,11 @@ interface StoragePanelProps {
 }
 
 const StoragePanel: React.FC<StoragePanelProps> = ({ onClose }) => {
-  const { documents, loadDocument, deleteStoredDocument, refreshDocuments } = useApp();
+  const { documents, loadDocument, deleteStoredDocument, renameStoredDocument, refreshDocuments } = useApp();
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [error, setError] = useState('');
 
   React.useEffect(() => {
     refreshDocuments();
@@ -24,6 +27,34 @@ const StoragePanel: React.FC<StoragePanelProps> = ({ onClose }) => {
   const handleDeleteDocument = (id: string) => {
     deleteStoredDocument(id);
     setConfirmDelete(null);
+  };
+
+  const startRename = (document: Document) => {
+    setEditingId(document.id);
+    setEditTitle(document.title);
+    setError('');
+  };
+
+  const handleRename = (id: string) => {
+    if (!editTitle.trim()) {
+      setError('Title cannot be empty');
+      return;
+    }
+    
+    const success = renameStoredDocument(id, editTitle.trim());
+    if (success) {
+      setEditingId(null);
+      setEditTitle('');
+      setError('');
+    } else {
+      setError('A presentation with this name already exists');
+    }
+  };
+
+  const cancelRename = () => {
+    setEditingId(null);
+    setEditTitle('');
+    setError('');
   };
 
   const formatDate = (date: Date) => {
@@ -63,20 +94,64 @@ const StoragePanel: React.FC<StoragePanelProps> = ({ onClose }) => {
                 className="mb-2 p-3 bg-white rounded border hover:border-blue-300 transition-colors"
               >
                 <div className="flex items-start justify-between mb-2">
-                  <h4
-                    className="font-medium text-gray-800 cursor-pointer hover:text-blue-600 flex-1 mr-2"
-                    onClick={() => handleLoadDocument(document)}
-                    title="Click to load"
-                  >
-                    {document.title}
-                  </h4>
-                  <button
-                    onClick={() => setConfirmDelete(document.id)}
-                    className="text-red-500 hover:text-red-700 text-sm leading-none"
-                    title="Delete"
-                  >
-                    🗑️
-                  </button>
+                  {editingId === document.id ? (
+                    <div className="flex-1 mr-2">
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleRename(document.id);
+                          if (e.key === 'Escape') cancelRename();
+                        }}
+                        className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        autoFocus
+                      />
+                      {error && (
+                        <p className="text-xs text-red-500 mt-1">{error}</p>
+                      )}
+                      <div className="flex gap-1 mt-2">
+                        <button
+                          onClick={() => handleRename(document.id)}
+                          className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={cancelRename}
+                          className="px-2 py-1 text-xs text-gray-600 hover:text-gray-800"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <h4
+                        className="font-medium text-gray-800 cursor-pointer hover:text-blue-600 flex-1 mr-2"
+                        onClick={() => handleLoadDocument(document)}
+                        title="Click to load"
+                      >
+                        {document.title}
+                      </h4>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => startRename(document)}
+                          className="text-gray-500 hover:text-gray-700 text-sm leading-none"
+                          title="Rename"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() => setConfirmDelete(document.id)}
+                          className="text-red-500 hover:text-red-700 text-sm leading-none"
+                          title="Delete"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
                 
                 <div className="text-xs text-gray-500 space-y-1">

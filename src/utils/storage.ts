@@ -40,8 +40,14 @@ export function getStoredDocuments(): Document[] {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return [];
     
-    const documents = JSON.parse(stored);
-    return documents.map((doc: any) => ({
+    const documents = JSON.parse(stored) as Array<{
+      id: string;
+      title: string;
+      content: string;
+      createdAt: string;
+      updatedAt: string;
+    }>;
+    return documents.map((doc) => ({
       ...doc,
       createdAt: new Date(doc.createdAt),
       updatedAt: new Date(doc.updatedAt)

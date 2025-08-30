@@ -1,15 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import Toolbar from './Toolbar';
 import StoragePanel from './StoragePanel';
 
+interface HistoryState {
+  content: string;
+  selectionStart: number;
+  selectionEnd: number;
+}
+
+const MAX_HISTORY_SIZE = 50;
+
 const Editor: React.FC = () => {
-  const { markdown, setMarkdown, saveCurrentDocument, loadDocument } = useApp();
+  const { markdown, setMarkdown, saveCurrentDocument } = useApp();
   const [showStorage, setShowStorage] = useState(false);
   const [saveTitle, setSaveTitle] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [history, setHistory] = useState<HistoryState[]>([{ content: markdown, selectionStart: 0, selectionEnd: 0 }]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const historyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSave = () => {
     if (!saveTitle.trim()) {
@@ -27,11 +39,97 @@ const Editor: React.FC = () => {
     }
   };
 
+  const addToHistory = useCallback((content: string, selectionStart: number, selectionEnd: number) => {
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push({ content, selectionStart, selectionEnd });
+      
+      // Limit history size
+      if (newHistory.length > MAX_HISTORY_SIZE) {
+        return newHistory.slice(-MAX_HISTORY_SIZE);
+      }
+      
+      return newHistory;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, MAX_HISTORY_SIZE - 1));
+  }, [historyIndex]);
+
+  const debouncedAddToHistory = useCallback((content: string) => {
+    if (historyTimeoutRef.current) {
+      clearTimeout(historyTimeoutRef.current);
+    }
+    
+    historyTimeoutRef.current = setTimeout(() => {
+      const textarea = textareaRef.current;
+      if (textarea) {
+        addToHistory(content, textarea.selectionStart, textarea.selectionEnd);
+      }
+    }, 500);
+  }, [addToHistory]);
+
+  const undo = useCallback(() => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      const prevState = history[newIndex];
+      setMarkdown(prevState.content);
+      setHistoryIndex(newIndex);
+      
+      setTimeout(() => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+          textarea.selectionStart = prevState.selectionStart;
+          textarea.selectionEnd = prevState.selectionEnd;
+        }
+      }, 0);
+    }
+  }, [history, historyIndex, setMarkdown]);
+
+  const redo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      const nextState = history[newIndex];
+      setMarkdown(nextState.content);
+      setHistoryIndex(newIndex);
+      
+      setTimeout(() => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+          textarea.selectionStart = nextState.selectionStart;
+          textarea.selectionEnd = nextState.selectionEnd;
+        }
+      }, 0);
+    }
+  }, [history, historyIndex, setMarkdown]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.ctrlKey || e.metaKey) {
       if (e.key === 's') {
         e.preventDefault();
         handleSave();
+      } else if (e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      } else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') {
+        e.preventDefault();
+        redo();
+      } else if (e.key === 'a') {
+        // Allow default select all behavior
+        return;
+      } else if (e.key === 'b') {
+        e.preventDefault();
+        insertMarkdownSyntax('**', true);
+      } else if (e.key === 'i') {
+        e.preventDefault();
+        insertMarkdownSyntax('*', true);
+      } else if (e.key === 'k') {
+        e.preventDefault();
+        insertMarkdownSyntax('[]()', false);
+        const textarea = textareaRef.current;
+        if (textarea) {
+          setTimeout(() => {
+            textarea.selectionStart = textarea.selectionEnd = textarea.selectionStart - 3;
+          }, 0);
+        }
       }
     }
     
@@ -43,7 +141,9 @@ const Editor: React.FC = () => {
       const end = target.selectionEnd;
       const value = target.value;
       
-      setMarkdown(value.substring(0, start) + '  ' + value.substring(end));
+      const newValue = value.substring(0, start) + '  ' + value.substring(end);
+      setMarkdown(newValue);
+      debouncedAddToHistory(newValue);
       
       // Restore cursor position
       setTimeout(() => {
@@ -53,7 +153,7 @@ const Editor: React.FC = () => {
   };
 
   const insertMarkdownSyntax = (syntax: string, wrap = false) => {
-    const textarea = document.getElementById('markdown-editor') as HTMLTextAreaElement;
+    const textarea = textareaRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
@@ -68,6 +168,7 @@ const Editor: React.FC = () => {
     }
     
     setMarkdown(newText);
+    debouncedAddToHistory(newText);
     
     setTimeout(() => {
       textarea.focus();
@@ -80,25 +181,43 @@ const Editor: React.FC = () => {
     }, 0);
   };
 
+  const handleMarkdownChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    setMarkdown(newValue);
+    debouncedAddToHistory(newValue);
+  };
+
   return (
     <div className="w-full h-full flex flex-col border-r lg:border-r border-b lg:border-b-0 border-gray-200 bg-white">
       <Toolbar
         onSave={handleSave}
         onToggleStorage={() => setShowStorage(!showStorage)}
         onInsertSyntax={insertMarkdownSyntax}
+        onUndo={undo}
+        onRedo={redo}
+        canUndo={historyIndex > 0}
+        canRedo={historyIndex < history.length - 1}
         showStorage={showStorage}
       />
       
       <div className="flex-1 flex">
         <div className={`${showStorage ? 'w-2/3' : 'w-full'} h-full`}>
           <textarea
-            id="markdown-editor"
+            ref={textareaRef}
             className="w-full h-full p-4 resize-none outline-none text-sm leading-relaxed markdown-editor"
             placeholder="# Your Presentation Title
 
 Start writing your presentation here...
 
 Use `---` to separate slides.
+
+Keyboard shortcuts:
+- Ctrl+S: Save
+- Ctrl+Z: Undo
+- Ctrl+Y: Redo
+- Ctrl+B: Bold
+- Ctrl+I: Italic
+- Ctrl+K: Link
 
 ---
 
@@ -119,7 +238,7 @@ You can use all standard Markdown formatting:
 
 This slide has a red background!"
             value={markdown}
-            onChange={(e) => setMarkdown(e.target.value)}
+            onChange={handleMarkdownChange}
             onKeyDown={handleKeyDown}
             spellCheck={false}
           />

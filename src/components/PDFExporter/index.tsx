@@ -35,7 +35,11 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
 
       // Create slides with proper styling
       slides.forEach((slide, index) => {
-        setExportProgress((index + 1) / slides.length * 100);
+        setExportProgress((index + 1) / slides.length * 50); // First 50% for processing
+        
+        if (!slide.content || slide.content.trim() === '') {
+          return; // Skip empty slides
+        }
         
         const slideDiv = document.createElement('div');
         slideDiv.style.width = '794px';
@@ -46,10 +50,11 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         slideDiv.style.display = 'flex';
         slideDiv.style.alignItems = 'center';
         slideDiv.style.justifyContent = 'center';
-        slideDiv.style.pageBreakAfter = 'always';
+        slideDiv.style.pageBreakAfter = index < slides.length - 1 ? 'always' : 'auto';
         slideDiv.style.fontSize = '18px';
         slideDiv.style.lineHeight = '1.6';
         slideDiv.style.color = '#1f2937';
+        slideDiv.className = `slide-${index + 1}`;
         
         // Apply custom slide styles if any
         const slideStyles = generateSlideStyles(slide.attributes);
@@ -58,48 +63,78 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         // Create content wrapper
         const contentWrapper = document.createElement('div');
         contentWrapper.style.width = '100%';
+        contentWrapper.style.maxWidth = '100%';
         contentWrapper.style.textAlign = 'center';
+        contentWrapper.style.overflow = 'hidden';
+        
+        // Extract text content from the slide content HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = slide.content;
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+        
+        if (textContent.trim() === '') {
+          return; // Skip slides with no actual text content
+        }
         
         // Clean up the slide content and add proper styling
-        const cleanContent = slide.content
+        let cleanContent = slide.content
           .replace(/class="slide-content"/g, '')
-          .replace(/<div[^>]*>/g, '<div>')
-          .replace(/<h1[^>]*>/g, '<h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1.5rem; color: #0f172a;">')
-          .replace(/<h2[^>]*>/g, '<h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 1.25rem; color: #1e293b;">')
-          .replace(/<h3[^>]*>/g, '<h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #334155;">')
-          .replace(/<p[^>]*>/g, '<p style="font-size: 1.25rem; line-height: 1.7; margin-bottom: 1rem; color: #475569;">')
-          .replace(/<ul[^>]*>/g, '<ul style="text-align: left; margin: 1rem 0; padding-left: 2rem; color: #475569;">')
-          .replace(/<ol[^>]*>/g, '<ol style="text-align: left; margin: 1rem 0; padding-left: 2rem; color: #475569;">')
-          .replace(/<li[^>]*>/g, '<li style="margin-bottom: 0.5rem;">');
+          .replace(/<div class="slide-content">/g, '<div>')
+          .replace(/<div[^>]*slide-content[^>]*>/g, '<div>')
+          .replace(/<h1[^>]*>/g, '<h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1.5rem; color: #0f172a; text-align: center;">')
+          .replace(/<h2[^>]*>/g, '<h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 1.25rem; color: #1e293b; text-align: center;">')
+          .replace(/<h3[^>]*>/g, '<h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #334155; text-align: center;">')
+          .replace(/<p[^>]*>/g, '<p style="font-size: 1.25rem; line-height: 1.7; margin-bottom: 1rem; color: #475569; text-align: center;">')
+          .replace(/<ul[^>]*>/g, '<ul style="text-align: left; margin: 1rem auto; padding-left: 2rem; color: #475569; display: inline-block;">')
+          .replace(/<ol[^>]*>/g, '<ol style="text-align: left; margin: 1rem auto; padding-left: 2rem; color: #475569; display: inline-block;">')
+          .replace(/<li[^>]*>/g, '<li style="margin-bottom: 0.5rem; font-size: 1.1rem;">')
+          .replace(/<code[^>]*>/g, '<code style="background-color: #f1f5f9; color: #dc2626; padding: 2px 8px; border-radius: 3px; font-family: \'Courier New\', monospace; font-size: 1rem;">')
+          .replace(/<pre[^>]*>/g, '<pre style="background-color: #1e293b; color: #e2e8f0; padding: 1.5rem; border-radius: 6px; overflow-x: auto; margin: 1.5rem 0; font-family: \'Courier New\', monospace; white-space: pre-wrap; text-align: left;">')
+          .replace(/<blockquote[^>]*>/g, '<blockquote style="border-left: 4px solid #3b82f6; background-color: #f8fafc; padding: 1rem 1.5rem; margin: 1.5rem 0; font-style: italic; border-radius: 4px; text-align: left;">')
+          .replace(/<a[^>]*>/g, '<a style="color: #2563eb; text-decoration: underline; font-weight: 500;">');
         
         contentWrapper.innerHTML = cleanContent;
         slideDiv.appendChild(contentWrapper);
         container.appendChild(slideDiv);
       });
 
+      if (container.children.length === 0) {
+        throw new Error('No slides to export. Please add some content to your presentation.');
+      }
+
+      setExportProgress(60); // 60% - starting PDF generation
+
       // PDF options
       const options = {
         margin: 0,
         filename: `${currentDocument?.title || 'presentation'}.pdf`,
-        image: { type: 'jpeg', quality: 1 },
+        image: { type: 'jpeg', quality: 0.95 },
         html2canvas: { 
-          scale: 1,
+          scale: 1.5,
           useCORS: true,
           letterRendering: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
           width: 794,
-          height: container.scrollHeight
+          height: 1123,
+          scrollX: 0,
+          scrollY: 0
         },
         jsPDF: { 
           unit: 'px', 
           format: [794, 1123], 
-          orientation: 'portrait'
-        }
+          orientation: 'portrait' as const,
+          hotfixes: ['px_scaling']
+        },
+        pagebreak: { mode: ['css', 'legacy'] }
       };
+
+      setExportProgress(80); // 80% - generating PDF
 
       // Generate PDF
       await html2pdf().set(options).from(container).save();
+      
+      setExportProgress(100); // 100% - complete
       
       // Cleanup
       document.body.removeChild(container);
