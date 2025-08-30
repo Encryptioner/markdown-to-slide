@@ -2,6 +2,7 @@
 
 ## General Rules
 1. Assess summary of your earlier tasks in `ai-summaries/task-1-initial-setup.md` file if you haven't already. And write or update the summary of your updates in that file when all the current commanded tasks/instructions are done. Keep it short. Include summary of key files changed (with info on functionality changed). You may update it in chronological way by step 1, step 2 and so on. It should reflect the continuos changes done on the codebase.
+2. If the instruction lists are not chronological, fix them
 
 
 ## Instruction List 1
@@ -23,7 +24,7 @@
 1. Added this command in middle `Always use pnpm for this project. Update wherever npm is mentioned` when asked to run `npm` command
 
 
-## Instruction List
+## Instruction List 3
 
 ### Instructions
 1. Got this error while running `pnpm dev`. In browser, it is `Runtime error - self is not defined`
@@ -55,7 +56,7 @@
 1. It fixed some issue. But there is more issue
 
 
-## Instruction List 3
+## Instruction List 4
 
 ### Instructions
 1. There is error related to `document.exitFullscreen?.();`
@@ -68,7 +69,7 @@
 1. I don't see any reasonable improvement
 
 
-## Instruction List 4
+## Instruction List 5
 
 ### Instructions
 1. I don't see any color related update. Check earlier instructions and ensure everything is done
@@ -116,7 +117,7 @@
 7. The `PDF` button still don't show the pdf with the content same as preview. It just shows blank pages. The pdf should be exported in a way that, it can later be used in other pdf/slide viewer to easily show as presentation
 
 
-## Instruction List 5
+## Instruction List 6
 
 ### Instructions
 1. Continue your earlier tasks
@@ -127,7 +128,7 @@
 2. On running `pnpm dev`, getting this error `Cannot access 'refreshDocuments' before initialization`
 
 
-## Instruction List 6
+## Instruction List 7
 
 ### Instructions
 1. The pdf export still doesn't work. It just downloads 1 blank page. There is no content where the slide was 2 page long. Fix this. Ensure, one can download an presentable version of pdf
@@ -138,7 +139,7 @@
 1. Reached limit middle of this. Instructed `continue` after limit reset
 
 
-## Instruction List 7
+## Instruction List 8
 
 ### Instructions
 1. The pdf export still exporting empty page. Let's work on it step by step. First, we should try to export the pdf by using slide viewer, not while full screen. When pdf is clicked, go thorough each page of slide in slide viewer and make page for each of them. Then join them to make one single pdf which can be exported.
@@ -152,7 +153,7 @@
 2. Other issue needs to be checked
 
 
-## Instruction List 8
+## Instruction List 9
 
 ### Instructions
 1. The UI issue is not solved. Refine the design and ensure it works for all screen. I've added some screenshots. Check images which name starts with `after_instruction_list_7` in `screenshots/tasks` directory
@@ -165,7 +166,7 @@
 1. It broke some design but added some things
 
 
-## Instruction List 9
+## Instruction List 10
 
 ### Instructions
 1. Remove the `FAQ` Section
@@ -180,7 +181,7 @@
 2. I've updated some part though
 
 
-## Instruction List 10
+## Instruction List 11
 
 ### Instructions
 1. In desktop, there is border for slide part. But not in markdown part. So, it looks odd. Keep border for both of them
@@ -193,4 +194,46 @@
 ### Comments
 1. The implementation is mostly ok
 2. I've installed and added phosphorus icon
- 
+
+
+## Instruction List 12
+
+### Instructions
+1. In `html -> image -> PDF` technique, the links of the slide couldn't be accessed. Also, the text couldn't be copied. Are there any other way, which will work? Which will generate pdf and also allow copying text, clicking image
+2. If the slide is long, we need it to scale down to fit in the pdf page. So, no text gets cut/removed
+
+### Comments
+1. Got Error while export
+
+
+## Instruction List 13
+
+### Instructions
+1. When generating PDF, got this error. Please fix errors and ensure the export works smoothly.
+   Failed to export PDF: Cannot read properties of undefined (reading 'vfs'). Please try again.
+   In console: hook.js:608 PDF export failed: TypeError: Cannot read properties of undefined (reading 'vfs') at exportToPDF (index.tsx:275:56)
+
+### Comments
+1. This error is fixed. But there is new error
+
+
+## Instruction List 14
+
+### Instructions
+1. hen generating PDF, got this error in console. Please fix errors and ensure the export works smoothly.
+   fontProvider.js:52 Uncaught (in promise) Error: Font 'Helvetica' in style 'bold' is not defined in the font section of the document definition.
+    at FontProvider.provideFont (fontProvider.js:52:1)
+
+### Comments
+1. The issue is still present
+
+
+## Instruction List 15
+
+### Instructions
+1. The issue didn't go away. It must be fixed for production ready development
+
+### Comments
+1. The error is gone. However, the content is not up to the mark.
+2. The lists, codeblock is left aligned where others are center aligned
+3. The links are also not clickable. So that, on click the link will open in new tab of browser

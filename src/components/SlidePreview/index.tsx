@@ -13,17 +13,17 @@ const SlidePreview: React.FC = () => {
 
   const currentSlideData = slides[currentSlide];
 
-  const handlePrevSlide = () => {
+  const handlePrevSlide = React.useCallback(() => {
     if (currentSlide > 0) {
       setCurrentSlide(currentSlide - 1);
     }
-  };
+  }, [currentSlide, setCurrentSlide]);
 
-  const handleNextSlide = () => {
+  const handleNextSlide = React.useCallback(() => {
     if (currentSlide < slides.length - 1) {
       setCurrentSlide(currentSlide + 1);
     }
-  };
+  }, [currentSlide, slides.length, setCurrentSlide]);
 
   const handleKeyDown = React.useCallback((e: KeyboardEvent) => {
     if (isFullscreen) {
