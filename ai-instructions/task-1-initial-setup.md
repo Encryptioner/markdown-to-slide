@@ -1,7 +1,7 @@
 # Task 1: Initial Setup - Instructions
 
 ## General Rules
-1. Assess summary of your earlier tasks in `ai-summaries/task-1-initial-setup.md` file. And write or update the summary of your updates in that file when all the current commanded tasks/instructions are done. Keep it short. Include summary of key files changed (with info on functionality changed). You may update it in chronological way by step 1, step 2 and so on. It should reflect the continuos changes done on the codebase.
+1. Assess summary of your earlier tasks in `ai-summaries/task-1-initial-setup.md` file if you haven't already. And write or update the summary of your updates in that file when all the current commanded tasks/instructions are done. Keep it short. Include summary of key files changed (with info on functionality changed). You may update it in chronological way by step 1, step 2 and so on. It should reflect the continuos changes done on the codebase.
 
 
 ## Instruction List 1
@@ -150,3 +150,27 @@
 ### Comments
 1. The pdf export issue is still not solved. May need other approach to solve this
 2. Other issue needs to be checked
+
+
+## Instruction List 8
+
+### Instructions
+1. The UI issue is not solved. Refine the design and ensure it works for all screen. I've added some screenshots. Check images which name starts with `after_instruction_list_7` in `screenshots/tasks` directory
+2. The examples doesn't load correctly. Specifically the example markdown files. That should be fixed
+3. Add some marketing info, add instructions sections, add Q&A, FAQ sections. However, those should be expandable and closable. So, it doesn't take much space unnecessarily. Ensure a cleaner modern look. Revamp the design if necessary.
+4. The pdf export still doesn't work. It shows generating PDF. However the generated PDF is an empty page. I have given screenshot in `after_instruction_list_7_3.png` file. Ensure this issue is fixed
+5. Ensure the website is modern, minimal, production ready with maintainable codebase 
+
+### Comments
+1. It broke some design but added some things
+
+
+## Instruction List 9
+
+### Instructions
+1. Remove the `FAQ` Section
+2. In desktop view, the design for markdown editor seems broke. It doesn't take same height as the presentation slide. The markdown editor should take same left space similar to slide preview
+3. Recheck design. If necessary rethought the design. Ensure it is minimal but attractive and must work on all screen size.
+4. For pdf export, check online if necessary. Find the best option. If getting pdf from html is having problem, let's use some package to create html to image. Then use that image to create PDF.
+5. The PDF button in full screen mode should be more understandable. U may use PDF icon/text there.
+6. Ensure the pdf export works for both slide preview and full screen preview. Try ur best. Think, research, then implement. Be concise.

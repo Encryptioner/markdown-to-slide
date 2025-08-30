@@ -19,7 +19,7 @@ body {
 
 /* Editor styles - light background with dark text */
 .markdown-editor {
-  background-color: #f8fafc !important;
+  background-color: aliceblue !important;
   color: #1e293b !important;
   border: 1px solid #e2e8f0 !important;
   font-family: "JetBrains Mono", "Fira Code", "Monaco", "Consolas", monospace;

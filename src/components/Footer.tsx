@@ -61,13 +61,15 @@ const Footer: React.FC = () => {
           
           <div className="text-sm text-gray-300">
             <p>Free & Open Source</p>
-            <p className="text-xs">MIT License</p>
           </div>
         </div>
         
         <div className="border-t border-gray-700 mt-2 pt-2 lg:mt-4 lg:pt-4 text-center">
           <p className="text-xs text-gray-400">
-            Transform your Markdown into professional presentations • No login required • Works offline
+            Transform your Markdown into professional presentations
+          </p>
+          <p className="text-xs text-gray-400">
+            No login required • Works offline
           </p>
         </div>
       </div>
