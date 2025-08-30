@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { ListIcon } from "@phosphor-icons/react";
 import { useApp } from '@/contexts/AppContext';
 
 const Header: React.FC = () => {
@@ -189,7 +190,7 @@ Start creating your own presentations with **Markdown to Slides**`;
             aria-label="Toggle menu"
             aria-expanded={showMenu}
           >
-            <span className="text-lg font-bold">☰</span>
+            <ListIcon className="size-6" />
           </button>
           
           {showMenu && (

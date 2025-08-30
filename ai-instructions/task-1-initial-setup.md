@@ -189,3 +189,8 @@
 3. In top of the page, add some logo and some minimal text. So, user can understand the concept. Also add a small text/button which will send to `How to use` section
 4. Also add blog icon in footer
 5.  `Files & Save` button seems having issue in mid size screen. Ensure it works ok for all size
+
+### Comments
+1. The implementation is mostly ok
+2. I've installed and added phosphorus icon
+ 
