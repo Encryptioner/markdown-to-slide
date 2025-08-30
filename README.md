@@ -163,12 +163,15 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 This project is licensed under the MIT License.
 
 ## 👨‍💻 Author
-
-**Ankur Mursalin**
-
-- Website: [https://encryptioner.github.io/](https://encryptioner.github.io/)
-- LinkedIn: [https://linkedin.com/in/ankur-mursalin](https://linkedin.com/in/ankur-mursalin)
-- Twitter: [@encryptioner](https://twitter.com/encryptioner)
+1. Name: Ankur Mursalin
+2. Email: mir.ankur.ruet13@gmail.com
+3. Website: [https://encryptioner.github.io/](https://encryptioner.github.io/)
+4. LinkedIn: [https://www.linkedin.com/in/mir-mursalin-ankur](https://www.linkedin.com/in/mir-mursalin-ankur)
+5. Github: [https://github.com/encryptioner](https://github.com/encryptioner)
+6. Twitter: [https://x.com/AnkurMursalin](https://x.com/AnkurMursalin)
+7. Blog: [https://dev.to/mir_mursalin_ankur](https://dev.to/mir_mursalin_ankur)
+8. Nerddevs: [https://nerddevs.com/author/ankur/](https://nerddevs.com/author/ankur/)
+9. Project Home Page: [https://encryptioner.github.io/linkedinify](https://encryptioner.github.io/linkedinify)
 
 ## 🙏 Acknowledgments
 

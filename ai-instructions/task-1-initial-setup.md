@@ -100,3 +100,18 @@
   sw.js:49 Uncaught (in promise) TypeError: Failed to execute 'put' on 'Cache': Request scheme 'chrome-extension' is unsupported
       at sw.js:49:23
 3. Ensure the code is production ready. It can be deployed as github pages and can be used as PWA
+
+
+## Comments
+1. The colors are updated and looks mostly ok now
+2. The preview is good. However, the codes need to be shown with special care. It should look good in preview and full screen
+3. The load example have issues. It doesn't load example. On load example, the slide number should be reset to 1
+4. There should have undo/redo functionality in editor. And common keyboard shortcut for editors should work
+5. On saved presentations, the name could be renamed
+6. On mobile/small screen, hamburger menu seems not working
+7. The `PDF` button still don't show the pdf with the content same as preview. It just shows blank pages. The pdf should be exported in a way that, it can later be used in other pdf/slide viewer to easily show as presentation
+
+
+## Instruction List 5
+1. Continue your earlier tasks
+2. Check earlier comments and fix all issues
