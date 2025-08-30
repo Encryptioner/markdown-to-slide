@@ -75,7 +75,7 @@ const LandingSections: React.FC = () => {
         </div>
 
         {/* Instructions Section */}
-        <div className="mb-12">
+        <div className="mb-12" id="instructions">
           <CollapsibleSection title="📚 How to Use" defaultOpen={true}>
             <div className="space-y-6">
               <div>

@@ -174,3 +174,18 @@
 4. For pdf export, check online if necessary. Find the best option. If getting pdf from html is having problem, let's use some package to create html to image. Then use that image to create PDF.
 5. The PDF button in full screen mode should be more understandable. U may use PDF icon/text there.
 6. Ensure the pdf export works for both slide preview and full screen preview. Try ur best. Think, research, then implement. Be concise.
+
+### Comments
+1. Kind of working version
+2. I've updated some part though
+
+
+## Instruction List 10
+
+### Instructions
+1. In desktop, there is border for slide part. But not in markdown part. So, it looks odd. Keep border for both of them
+2. Sometimes this error shows in console. It generates from <body className="antialiased"> data-new-gr-c-s-check-loaded="14.1251.0"
+  A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+3. In top of the page, add some logo and some minimal text. So, user can understand the concept. Also add a small text/button which will send to `How to use` section
+4. Also add blog icon in footer
+5.  `Files & Save` button seems having issue in mid size screen. Ensure it works ok for all size

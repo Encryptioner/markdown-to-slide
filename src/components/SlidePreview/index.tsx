@@ -74,7 +74,7 @@ const SlidePreview: React.FC = () => {
   const slideStyles = generateSlideStyles(currentSlideData.attributes);
 
   return (
-    <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-black' : 'w-full h-full'} flex flex-col`}>
+    <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-black' : 'w-full h-full border border-gray-200'} flex flex-col`}>
       {!isFullscreen && (
         <PreviewControls 
           onFullscreen={() => setFullscreen(true)}
