@@ -44,64 +44,110 @@ self.addEventListener('activate', (event) => {
 // Fetch event - handle requests carefully
 self.addEventListener('fetch', (event) => {
   const url = event.request.url;
+  const request = event.request;
   
-  // Skip all problematic requests
+  // Skip all problematic requests - more comprehensive filtering
   if (!url.startsWith(self.location.origin) || 
       url.startsWith('chrome-extension://') ||
+      url.startsWith('moz-extension://') ||
+      url.startsWith('safari-extension://') ||
       url.includes('_next/webpack-hmr') ||
       url.includes('__nextjs_original-stack-frames') ||
       url.includes('hot-reload') ||
       url.includes('.hot-update.') ||
-      event.request.method !== 'GET') {
-    return;
+      url.includes('/api/') ||
+      request.method !== 'GET') {
+    return; // Don't intercept these requests at all
   }
 
-  // In development, skip caching for most requests
+  // In development, minimal service worker functionality
   if (!isProduction) {
     // Only handle offline fallback for navigation requests
-    if (event.request.destination === 'document') {
+    if (request.destination === 'document') {
       event.respondWith(
-        fetch(event.request).catch(() => {
-          return caches.match('/') || new Response('Offline', { 
-            status: 503, 
-            statusText: 'Service Unavailable' 
+        fetch(request).catch(() => {
+          return caches.match('/').then(cachedResponse => {
+            return cachedResponse || new Response(
+              '<!DOCTYPE html><html><head><title>Offline</title></head><body><h1>You are offline</h1><p>Please check your internet connection.</p></body></html>', 
+              { 
+                status: 503, 
+                statusText: 'Service Unavailable',
+                headers: { 'Content-Type': 'text/html' }
+              }
+            );
           });
         })
       );
     }
-    return;
+    return; // Skip caching in development
   }
 
   // Production caching strategy
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
+    caches.match(request)
+      .then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
         }
         
-        return fetch(event.request).then((fetchResponse) => {
-          if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
+        return fetch(request)
+          .then((fetchResponse) => {
+            // Only cache successful responses
+            if (!fetchResponse || 
+                fetchResponse.status !== 200 || 
+                fetchResponse.type !== 'basic' ||
+                !fetchResponse.ok) {
+              return fetchResponse;
+            }
+
+            // Clone the response for caching
+            const responseToCache = fetchResponse.clone();
+            
+            // Cache the response (don't await - fire and forget)
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                try {
+                  return cache.put(request, responseToCache);
+                } catch (error) {
+                  console.warn('Cache put failed:', error.message);
+                }
+              })
+              .catch((error) => {
+                console.warn('Cache operation failed:', error.message);
+              });
+
             return fetchResponse;
-          }
-
-          const responseToCache = fetchResponse.clone();
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            })
-            .catch((error) => {
-              console.log('Cache put failed:', error);
+          })
+          .catch((fetchError) => {
+            console.warn('Fetch failed:', fetchError.message);
+            
+            // Provide fallback for navigation requests
+            if (request.destination === 'document') {
+              return caches.match('/').then(cachedResponse => {
+                return cachedResponse || new Response(
+                  '<!DOCTYPE html><html><head><title>Offline</title></head><body><h1>You are offline</h1><p>Please check your internet connection.</p></body></html>', 
+                  { 
+                    status: 503, 
+                    statusText: 'Service Unavailable',
+                    headers: { 'Content-Type': 'text/html' }
+                  }
+                );
+              });
+            }
+            
+            // For other failed requests, return a generic error response
+            return new Response('Resource not available offline', { 
+              status: 503, 
+              statusText: 'Service Unavailable' 
             });
-
-          return fetchResponse;
-        });
+          });
       })
-      .catch(() => {
-        if (event.request.destination === 'document') {
-          return caches.match('/');
-        }
-        return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+      .catch((error) => {
+        console.warn('Cache match failed:', error.message);
+        return new Response('Cache error', { 
+          status: 503, 
+          statusText: 'Service Unavailable' 
+        });
       })
   );
 });

@@ -22,8 +22,14 @@ export async function parseMarkdownToSlides(markdown: string): Promise<Slide[]> 
     // Convert markdown to HTML
     const htmlContent = await marked.parse(cleanContent);
     
+    // Wrap code blocks for proper centering
+    const wrappedContent = htmlContent.replace(
+      /<pre><code[^>]*>([\s\S]*?)<\/code><\/pre>/g,
+      '<div class="code-wrapper"><pre><code>$1</code></pre></div>'
+    );
+    
     // Sanitize HTML
-    const sanitizedContent = DOMPurify.sanitize(htmlContent);
+    const sanitizedContent = DOMPurify.sanitize(wrappedContent);
     
     return {
       id: (index + 1).toString(),

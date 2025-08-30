@@ -125,3 +125,14 @@
 ### Comments
 1. It requires clearing cache/site data to see updated ui when running `pnpm dev`. Won't site refresh/hard reload fix that? How to see the updated view every time
 2. On running `pnpm dev`, getting this error `Cannot access 'refreshDocuments' before initialization`
+
+
+## Instruction List 6
+
+### Instructions
+1. The pdf export still doesn't work. It just downloads 1 blank page. There is no content where the slide was 2 page long. Fix this. Ensure, one can download an presentable version of pdf
+2. Each line of the code (if in markdown) in preview don't need to be centered aligned. However, Code div or content could be centered. And inside that div/area code need to be left aligned for better visibility.
+3. The print confirmation and other notification should look good in both mobile and desktop view.
+
+### Comments
+1. Reached limit middle of this. Instructed `continue` after limit reset

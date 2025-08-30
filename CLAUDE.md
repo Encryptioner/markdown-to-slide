@@ -106,3 +106,4 @@ Created by [Ankur Mursalin](https://encryptioner.github.io/) - include in footer
 3. You must ensure production ready, professional, scalable and maintainable code
 4. You must ensure the website follows responsive design and works good in all screen
 5. Ensure the UX and UI follows latest standard and attractive (not pushy) to use
+6. Must kill all the bash script after providing final output in chat

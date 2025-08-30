@@ -57,14 +57,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     if (typeof document !== 'undefined') {
       if (fullscreen) {
-        document.documentElement.requestFullscreen?.().catch((err) => {
-          console.log('Fullscreen request failed:', err);
-        });
+        // Use a timeout to ensure the document is ready
+        setTimeout(() => {
+          const element = document.documentElement;
+          if (element.requestFullscreen) {
+            element.requestFullscreen().catch((err) => {
+              console.log('Fullscreen request failed:', err);
+            });
+          } else if ((element as unknown as { webkitRequestFullscreen?: () => void }).webkitRequestFullscreen) {
+            (element as unknown as { webkitRequestFullscreen: () => void }).webkitRequestFullscreen();
+          } else if ((element as unknown as { msRequestFullscreen?: () => void }).msRequestFullscreen) {
+            (element as unknown as { msRequestFullscreen: () => void }).msRequestFullscreen();
+          }
+        }, 100);
       } else {
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.().catch((err) => {
-            console.log('Exit fullscreen failed:', err);
-          });
+        // Only exit fullscreen if we're actually in fullscreen mode
+        if (document.fullscreenElement || 
+            (document as unknown as { webkitFullscreenElement?: Element }).webkitFullscreenElement || 
+            (document as unknown as { msFullscreenElement?: Element }).msFullscreenElement) {
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch((err) => {
+              console.log('Exit fullscreen failed:', err);
+            });
+          } else if ((document as unknown as { webkitExitFullscreen?: () => void }).webkitExitFullscreen) {
+            (document as unknown as { webkitExitFullscreen: () => void }).webkitExitFullscreen();
+          } else if ((document as unknown as { msExitFullscreen?: () => void }).msExitFullscreen) {
+            (document as unknown as { msExitFullscreen: () => void }).msExitFullscreen();
+          }
         }
       }
     }
@@ -119,7 +138,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     initializeSlides();
     refreshDocuments();
-  }, [refreshDocuments]);
+  }, [markdown, refreshDocuments]);
 
   const value: AppContextType = {
     markdown,

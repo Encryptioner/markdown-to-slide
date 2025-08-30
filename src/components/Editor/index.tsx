@@ -251,8 +251,8 @@ This slide has a red background!"
 
       {/* Save Dialog */}
       {showSaveDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-2 sm:px-4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-xl max-w-xs sm:max-w-md w-full mx-2 sm:mx-4">
             <h3 className="text-lg font-semibold mb-4">Save Presentation</h3>
             <input
               type="text"
@@ -263,16 +263,18 @@ This slide has a red background!"
               onKeyDown={(e) => e.key === 'Enter' && confirmSave()}
               autoFocus
             />
-            <div className="flex gap-3 justify-end">
+            <div className="flex flex-col sm:flex-row gap-3 justify-end">
               <button
                 onClick={() => setShowSaveDialog(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors order-2 sm:order-1"
+                type="button"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors order-1 sm:order-2"
+                type="button"
               >
                 Save
               </button>

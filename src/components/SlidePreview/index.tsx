@@ -23,7 +23,7 @@ const SlidePreview: React.FC = () => {
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+  const handleKeyDown = React.useCallback((e: KeyboardEvent) => {
     if (isFullscreen) {
       switch (e.key) {
         case 'ArrowLeft':
@@ -51,12 +51,12 @@ const SlidePreview: React.FC = () => {
           break;
       }
     }
-  };
+  }, [currentSlide, slides.length, isFullscreen, setCurrentSlide, setFullscreen, handlePrevSlide, handleNextSlide]);
 
   React.useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [currentSlide, slides.length, isFullscreen]);
+  }, [handleKeyDown]);
 
   if (!currentSlideData) {
     return (
