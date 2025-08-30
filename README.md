@@ -171,7 +171,7 @@ This project is licensed under the MIT License.
 6. Twitter: [https://x.com/AnkurMursalin](https://x.com/AnkurMursalin)
 7. Blog: [https://dev.to/mir_mursalin_ankur](https://dev.to/mir_mursalin_ankur)
 8. Nerddevs: [https://nerddevs.com/author/ankur/](https://nerddevs.com/author/ankur/)
-9. Project Home Page: [https://encryptioner.github.io/linkedinify](https://encryptioner.github.io/linkedinify)
+9. Project Home Page: [https://encryptioner.github.io/markdown-to-slide](https://encryptioner.github.io/markdown-to-slide)
 
 ## 🙏 Acknowledgments
 
