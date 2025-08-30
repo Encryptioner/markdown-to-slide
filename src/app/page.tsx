@@ -8,11 +8,11 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-1 flex flex-col lg:flex-row">
-        <div className="w-full lg:w-1/2 h-[50vh] lg:h-auto">
+      <main className="flex-1 flex flex-col lg:flex-row min-h-0">
+        <div className="w-full lg:w-1/2 h-[45vh] lg:h-auto lg:min-h-0 flex-1">
           <Editor />
         </div>
-        <div className="w-full lg:w-1/2 h-[50vh] lg:h-auto">
+        <div className="w-full lg:w-1/2 h-[45vh] lg:h-auto lg:min-h-0 flex-1">
           <SlidePreview />
         </div>
       </main>

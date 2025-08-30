@@ -136,3 +136,17 @@
 
 ### Comments
 1. Reached limit middle of this. Instructed `continue` after limit reset
+
+
+## Instruction List 7
+
+### Instructions
+1. The pdf export still exporting empty page. Let's work on it step by step. First, we should try to export the pdf by using slide viewer, not while full screen. When pdf is clicked, go thorough each page of slide in slide viewer and make page for each of them. Then join them to make one single pdf which can be exported.
+2. Later, on the full screen view, we will give a pdf button and it will create pdf from the view of full screen
+3. Ensure the website works in both mobile and desktop screen. The UI should be responsive, and there should not have any odd design. 
+4. One issue I found that, when switched from desktop to mobile view, there is too much whitespace at bottom of footer
+5. Another issue, when browser inspect tab is opened, and I reload the website, it shows `You are offline Please check your internet connection . Is it ok?` I am running `pnpm dev`. My cached is disabled when the network/console shows in browser
+
+### Comments
+1. The pdf export issue is still not solved. May need other approach to solve this
+2. Other issue needs to be checked

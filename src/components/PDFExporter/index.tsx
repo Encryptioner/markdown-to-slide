@@ -9,7 +9,7 @@ interface PDFExportProps {
 }
 
 const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
-  const { slides, currentDocument } = useApp();
+  const { slides, currentDocument, currentSlide, setCurrentSlide } = useApp();
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
 
@@ -23,132 +23,145 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
       // Dynamically import html2pdf.js to avoid SSR issues
       const html2pdf = (await import('html2pdf.js')).default;
       
-      // Create a temporary container for all slides
-      const container = document.createElement('div');
-      container.style.cssText = `
+      // Find the slide preview container to capture actual rendered slides
+      const slideViewer = document.querySelector('.slide-content');
+      if (!slideViewer) {
+        throw new Error('Could not find slide viewer. Please make sure slides are visible.');
+      }
+      
+      // Create container for all PDF pages
+      const pdfContainer = document.createElement('div');
+      pdfContainer.style.cssText = `
         position: fixed;
         left: -9999px;
         top: 0;
-        width: 210mm;
-        background-color: white;
+        width: 794px;
+        height: auto;
+        background: white;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         z-index: -1000;
       `;
-      document.body.appendChild(container);
-
-      // Process each slide
-      for (let index = 0; index < slides.length; index++) {
-        const slide = slides[index];
-        setExportProgress((index + 1) / slides.length * 60); // First 60% for processing
+      document.body.appendChild(pdfContainer);
+      
+      // Store original slide index  
+      const originalSlide = currentSlide;
+      
+      // Process each slide by temporarily switching to it
+      for (let slideIndex = 0; slideIndex < slides.length; slideIndex++) {
+        setExportProgress((slideIndex / slides.length) * 80); // 80% for processing slides
         
+        const slide = slides[slideIndex];
         if (!slide.content || slide.content.trim() === '') {
-          continue; // Skip empty slides
+          continue;
         }
         
-        const slideDiv = document.createElement('div');
-        slideDiv.style.cssText = `
-          width: 210mm;
-          min-height: 297mm;
-          padding: 20mm;
+        // Switch to this slide to render it properly
+        setCurrentSlide(slideIndex);
+        
+        // Wait for slide to render
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Create a page for this slide
+        const slidePage = document.createElement('div');
+        slidePage.style.cssText = `
+          width: 794px;
+          height: 1123px;
+          padding: 60px;
           box-sizing: border-box;
-          background-color: white;
+          background: white;
           display: flex;
           align-items: center;
           justify-content: center;
-          page-break-after: ${index < slides.length - 1 ? 'always' : 'auto'};
+          page-break-after: ${slideIndex < slides.length - 1 ? 'always' : 'auto'};
           position: relative;
-          overflow: hidden;
         `;
         
-        // Apply custom slide styles if any
+        // Apply custom slide background if any
         const slideStyles = generateSlideStyles(slide.attributes);
         if (slideStyles.backgroundColor) {
-          slideDiv.style.backgroundColor = slideStyles.backgroundColor;
+          slidePage.style.backgroundColor = slideStyles.backgroundColor;
         }
         if (slideStyles.backgroundImage) {
-          slideDiv.style.backgroundImage = slideStyles.backgroundImage;
-          slideDiv.style.backgroundSize = 'cover';
-          slideDiv.style.backgroundPosition = 'center';
-          slideDiv.style.backgroundRepeat = 'no-repeat';
+          slidePage.style.backgroundImage = slideStyles.backgroundImage;
+          slidePage.style.backgroundSize = 'cover';
+          slidePage.style.backgroundPosition = 'center';
+          slidePage.style.backgroundRepeat = 'no-repeat';
         }
         
-        // Create content wrapper
-        const contentWrapper = document.createElement('div');
-        contentWrapper.style.cssText = `
+        // Create content container
+        const contentDiv = document.createElement('div');
+        contentDiv.style.cssText = `
           width: 100%;
-          max-width: 100%;
           text-align: center;
           color: #1f2937;
         `;
         
-        // Process the slide content with proper styling
+        // Copy and style the slide content
         const processedContent = slide.content
-          .replace(/<div class="slide-content">[\s\S]*?>(.*?)<\/div>/, '$1')
-          .replace(/<div class="slide-content">(.*?)<\/div>/g, '$1')
-          .replace(/<h1[^>]*>/g, '<h1 style="font-size: 48px; font-weight: 800; margin-bottom: 32px; color: #0f172a; text-align: center; line-height: 1.2;">')
-          .replace(/<h2[^>]*>/g, '<h2 style="font-size: 36px; font-weight: 700; margin-bottom: 24px; color: #1e293b; text-align: center; line-height: 1.3;">')
-          .replace(/<h3[^>]*>/g, '<h3 style="font-size: 28px; font-weight: 600; margin-bottom: 20px; color: #334155; text-align: center; line-height: 1.4;">')
-          .replace(/<p[^>]*>/g, '<p style="font-size: 20px; line-height: 1.7; margin-bottom: 16px; color: #475569; text-align: center;">')
-          .replace(/<ul[^>]*>/g, '<ul style="text-align: left; margin: 16px auto; padding-left: 32px; color: #475569; display: inline-block; font-size: 18px; line-height: 1.6;">')
-          .replace(/<ol[^>]*>/g, '<ol style="text-align: left; margin: 16px auto; padding-left: 32px; color: #475569; display: inline-block; font-size: 18px; line-height: 1.6;">')
-          .replace(/<li[^>]*>/g, '<li style="margin-bottom: 8px;">')
-          .replace(/<code[^>]*>/g, '<code style="background-color: #f1f5f9; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-family: \'JetBrains Mono\', monospace; font-size: 16px; border: 1px solid #e2e8f0;">')
-          .replace(/<div class="code-wrapper"><pre><code>/g, '<div style="text-align: center; margin: 24px 0;"><pre style="background-color: #1e293b; color: #e2e8f0; padding: 24px; border-radius: 8px; font-family: \'JetBrains Mono\', monospace; font-size: 14px; line-height: 1.5; text-align: left; display: inline-block; max-width: 100%; overflow-x: auto; border: 1px solid #334155; white-space: pre-wrap;"><code>')
-          .replace(/<\/code><\/pre><\/div>/g, '</code></pre></div>')
-          .replace(/<pre><code[^>]*>/g, '<div style="text-align: center; margin: 24px 0;"><pre style="background-color: #1e293b; color: #e2e8f0; padding: 24px; border-radius: 8px; font-family: \'JetBrains Mono\', monospace; font-size: 14px; line-height: 1.5; text-align: left; display: inline-block; max-width: 100%; overflow-x: auto; border: 1px solid #334155; white-space: pre-wrap;"><code>')
-          .replace(/<\/code><\/pre>/g, '</code></pre></div>')
-          .replace(/<blockquote[^>]*>/g, '<blockquote style="border-left: 4px solid #3b82f6; background-color: #f8fafc; padding: 16px 24px; margin: 24px auto; font-style: italic; border-radius: 4px; text-align: left; max-width: 80%; color: #475569; font-size: 18px;">')
+          .replace(/<div class="slide-content"[^>]*>/, '')
+          .replace(/<\/div>$/, '')
+          .replace(/<h1[^>]*>/g, '<h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem; color: #0f172a; text-align: center; line-height: 1.2;">')
+          .replace(/<h2[^>]*>/g, '<h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; color: #1e293b; text-align: center; line-height: 1.3;">')
+          .replace(/<h3[^>]*>/g, '<h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #334155; text-align: center; line-height: 1.4;">')
+          .replace(/<p[^>]*>/g, '<p style="font-size: 1.25rem; line-height: 1.7; margin-bottom: 1rem; color: #475569; text-align: center;">')
+          .replace(/<ul[^>]*>/g, '<ul style="text-align: left; margin: 1rem auto; padding-left: 2rem; color: #475569; display: inline-block; font-size: 1.125rem; line-height: 1.6;">')
+          .replace(/<ol[^>]*>/g, '<ol style="text-align: left; margin: 1rem auto; padding-left: 2rem; color: #475569; display: inline-block; font-size: 1.125rem; line-height: 1.6;">')
+          .replace(/<li[^>]*>/g, '<li style="margin-bottom: 0.5rem;">')
+          .replace(/<code[^>]*>/g, '<code style="background: #f1f5f9; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-family: \'JetBrains Mono\', monospace; font-size: 0.9em; border: 1px solid #e2e8f0;">')
+          .replace(/<div class="code-wrapper">/g, '<div style="text-align: center; margin: 1.5rem 0;">')
+          .replace(/<pre[^>]*>/g, '<pre style="background: #1e293b; color: #e2e8f0; padding: 1.5rem; border-radius: 8px; font-family: \'JetBrains Mono\', monospace; font-size: 0.875rem; line-height: 1.5; text-align: left; display: inline-block; max-width: 90%; overflow-x: auto; border: 1px solid #334155; white-space: pre-wrap;">')
+          .replace(/<blockquote[^>]*>/g, '<blockquote style="border-left: 4px solid #3b82f6; background: #f8fafc; padding: 1rem 1.5rem; margin: 1.5rem auto; font-style: italic; border-radius: 4px; text-align: left; max-width: 80%; color: #475569; font-size: 1.125rem;">')
           .replace(/<a[^>]*>/g, '<a style="color: #2563eb; text-decoration: underline; font-weight: 500;">');
         
-        contentWrapper.innerHTML = processedContent;
-        slideDiv.appendChild(contentWrapper);
-        container.appendChild(slideDiv);
+        contentDiv.innerHTML = processedContent;
+        slidePage.appendChild(contentDiv);
+        pdfContainer.appendChild(slidePage);
       }
-
-      if (container.children.length === 0) {
+      
+      // Restore original slide
+      setCurrentSlide(originalSlide);
+      
+      if (pdfContainer.children.length === 0) {
         throw new Error('No slides to export. Please add some content to your presentation.');
       }
 
-      setExportProgress(70); // 70% - starting PDF generation
+      setExportProgress(85); // 85% - generating PDF
 
-      // PDF options optimized for presentation slides
+      // PDF generation options
       const options = {
         margin: 0,
         filename: `${currentDocument?.title || 'presentation'}.pdf`,
         image: { 
           type: 'jpeg', 
-          quality: 0.98 
+          quality: 0.95 
         },
         html2canvas: { 
-          scale: 2,
+          scale: 1.5,
           useCORS: true,
           letterRendering: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
-          logging: false,
-          windowWidth: 794,
-          windowHeight: 1123
+          width: 794,
+          height: 1123,
+          logging: false
         },
         jsPDF: { 
-          unit: 'mm',
-          format: 'a4',
+          unit: 'px',
+          format: [794, 1123],
           orientation: 'portrait' as const
         },
         pagebreak: { 
-          mode: ['css', 'legacy'],
-          before: '.slide-page-break'
+          mode: ['css', 'legacy'] 
         }
       };
 
-      setExportProgress(85); // 85% - generating PDF
-
-      // Generate PDF
-      await html2pdf().set(options).from(container).save();
+      // Generate the PDF
+      await html2pdf().set(options).from(pdfContainer).save();
       
-      setExportProgress(100); // 100% - complete
+      setExportProgress(100);
       
       // Cleanup
-      document.body.removeChild(container);
+      document.body.removeChild(pdfContainer);
       
     } catch (error) {
       console.error('PDF export failed:', error);

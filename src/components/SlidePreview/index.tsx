@@ -1,13 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { generateSlideStyles } from '@/utils/markdownParser';
 import PreviewControls from './PreviewControls';
 import SlideNavigation from './SlideNavigation';
+import PDFExporter from '../PDFExporter';
 
 const SlidePreview: React.FC = () => {
   const { slides, currentSlide, setCurrentSlide, isFullscreen, setFullscreen } = useApp();
+  const [showPDFExport, setShowPDFExport] = useState(false);
 
   const currentSlideData = slides[currentSlide];
 
@@ -111,6 +113,13 @@ const SlidePreview: React.FC = () => {
         {isFullscreen && (
           <div className="absolute top-4 right-4 flex gap-2">
             <button
+              onClick={() => setShowPDFExport(true)}
+              className="p-2 bg-black bg-opacity-50 text-white rounded hover:bg-opacity-70"
+              title="Export PDF"
+            >
+              📄
+            </button>
+            <button
               onClick={handlePrevSlide}
               disabled={currentSlide === 0}
               className="p-2 bg-black bg-opacity-50 text-white rounded hover:bg-opacity-70 disabled:opacity-30"
@@ -143,6 +152,11 @@ const SlidePreview: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* PDF Export Modal for fullscreen mode */}
+      {showPDFExport && (
+        <PDFExporter onClose={() => setShowPDFExport(false)} />
+      )}
     </div>
   );
 };

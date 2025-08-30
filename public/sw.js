@@ -13,31 +13,37 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
       caches.open(CACHE_NAME)
         .then((cache) => {
-          console.log('Opened cache');
+          console.log('SW: Opened cache');
           return cache.addAll(urlsToCache);
         })
         .catch((error) => {
-          console.log('Cache add failed:', error);
+          console.log('SW: Cache add failed:', error);
         })
     );
+  } else {
+    console.log('SW: Skipping cache during development');
   }
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches (only in production)
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
+  if (isProduction) {
+    event.waitUntil(
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== CACHE_NAME) {
+              console.log('SW: Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+    );
+  } else {
+    console.log('SW: Skipping cache cleanup during development');
+  }
   self.clients.claim();
 });
 
@@ -60,26 +66,10 @@ self.addEventListener('fetch', (event) => {
     return; // Don't intercept these requests at all
   }
 
-  // In development, minimal service worker functionality
+  // In development, completely skip service worker functionality to avoid conflicts
   if (!isProduction) {
-    // Only handle offline fallback for navigation requests
-    if (request.destination === 'document') {
-      event.respondWith(
-        fetch(request).catch(() => {
-          return caches.match('/').then(cachedResponse => {
-            return cachedResponse || new Response(
-              '<!DOCTYPE html><html><head><title>Offline</title></head><body><h1>You are offline</h1><p>Please check your internet connection.</p></body></html>', 
-              { 
-                status: 503, 
-                statusText: 'Service Unavailable',
-                headers: { 'Content-Type': 'text/html' }
-              }
-            );
-          });
-        })
-      );
-    }
-    return; // Skip caching in development
+    // Let all requests pass through to the network normally
+    return;
   }
 
   // Production caching strategy

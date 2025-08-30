@@ -4,10 +4,10 @@ import React from 'react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-800 text-white py-6 mt-8">
+    <footer className="bg-gray-800 text-white py-4 lg:py-6 mt-auto">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
+          <div className="mb-2 md:mb-0">
             <p className="text-sm">
               Created by{' '}
               <a 
@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
             </p>
           </div>
           
-          <div className="flex items-center space-x-4 mb-4 md:mb-0">
+          <div className="flex items-center space-x-4 mb-2 md:mb-0">
             <a
               href="https://github.com/Encryptioner/markdown-to-slide"
               target="_blank"
@@ -65,7 +65,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
         
-        <div className="border-t border-gray-700 mt-4 pt-4 text-center">
+        <div className="border-t border-gray-700 mt-2 pt-2 lg:mt-4 lg:pt-4 text-center">
           <p className="text-xs text-gray-400">
             Transform your Markdown into professional presentations • No login required • Works offline
           </p>
