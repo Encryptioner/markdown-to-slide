@@ -49,13 +49,14 @@ Slides are separated with `---` and support custom attributes:
 
 ## Development Commands
 
-Since this project is in planning phase, these commands should be set up:
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run lint` - Run ESLint
-- `npm run test` - Run Jest unit tests
-- `npm run e2e` - Run end-to-end tests
-- `npm run deploy` - Deploy to GitHub Pages
+**This project uses pnpm as the package manager:**
+- `pnpm install` - Install dependencies
+- `pnpm run dev` - Start development server
+- `pnpm run build` - Build for production
+- `pnpm run lint` - Run ESLint
+- `pnpm run test` - Run Jest unit tests
+- `pnpm run type-check` - Run TypeScript type checking
+- `pnpm run export` - Build and export for static deployment
 
 ## Project Structure
 

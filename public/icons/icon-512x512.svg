@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="64" fill="#2563eb"/>
+  
+  <!-- Markdown icon -->
+  <path d="M128 320h64l32-64 32 64h64V192h-64v80l-32-48-32 48v-80h-64v128z" fill="white"/>
+  
+  <!-- Slides representation -->
+  <rect x="308" y="208" width="80" height="64" rx="4" fill="white" opacity="0.8"/>
+  <rect x="320" y="224" width="56" height="32" rx="2" fill="#2563eb"/>
+  
+  <rect x="308" y="248" width="80" height="64" rx="4" fill="white" opacity="0.6"/>
+  <rect x="320" y="264" width="56" height="32" rx="2" fill="#2563eb"/>
+  
+  <rect x="308" y="288" width="80" height="64" rx="4" fill="white" opacity="0.4"/>
+  <rect x="320" y="304" width="56" height="32" rx="2" fill="#2563eb"/>
+</svg>
