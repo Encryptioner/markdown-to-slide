@@ -5,6 +5,7 @@ import { useApp } from '@/contexts/AppContext';
 
 interface PDFExportProps {
   onClose?: () => void;
+  isFullscreenTheme?: boolean;
 }
 
 // Define types for pdfmake content
@@ -27,6 +28,7 @@ interface ContentList {
   ol?: ContentText[];
   style?: string;
   margin?: [number, number, number, number];
+  alignment?: 'left' | 'center' | 'right';
 }
 
 interface ContentCanvas {
@@ -40,12 +42,22 @@ interface ContentCanvas {
   }[];
 }
 
+interface ContentTable {
+  table: {
+    widths: string[];
+    body: ContentText[][];
+  };
+  layout: string;
+  alignment: 'left' | 'center' | 'right';
+  margin?: [number, number, number, number];
+}
+
 interface PageBreak {
   text: string;
   pageBreak: 'before';
 }
 
-type Content = ContentText | ContentList | ContentCanvas | PageBreak;
+type Content = ContentText | ContentList | ContentCanvas | ContentTable | PageBreak;
 
 interface DocumentDefinition {
   pageSize: {
@@ -73,7 +85,7 @@ interface DocumentDefinition {
   };
 }
 
-const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
+const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = false }) => {
   const { slides, currentDocument } = useApp();
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
@@ -140,9 +152,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
               return {
                 text: element.textContent || href,
                 link: href,
-                style: 'link',
-                color: '#2563eb',
-                decoration: 'underline'
+                style: 'link'
               } as ContentText;
             }
             break;
@@ -160,7 +170,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             return {
               ul: ulItems,
               style: 'list',
-              margin: [20, 10, 20, 10]
+              margin: [0, 10, 0, 10],
+              alignment: 'center'
             } as ContentList;
             
           case 'ol':
@@ -176,7 +187,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             return {
               ol: olItems,
               style: 'list',
-              margin: [20, 10, 20, 10]
+              margin: [0, 10, 0, 10],
+              alignment: 'center'
             } as ContentList;
             
           case 'code':
@@ -188,12 +200,31 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             
           case 'pre':
             const codeContent = element.querySelector('code')?.textContent || element.textContent || '';
+            // Create a centered wrapper with left-aligned code content
             return {
-              text: codeContent,
-              style: 'codeBlock',
-              margin: [0, 10, 0, 10],
-              preserveLeadingSpaces: true
-            } as ContentText;
+              table: {
+                widths: ['auto'],
+                body: [[
+                  {
+                    text: codeContent,
+                    style: 'codeBlock',
+                    preserveLeadingSpaces: true,
+                    alignment: 'left'
+                  }
+                ]]
+              },
+              layout: {
+                fillColor: () => '#1e293b',
+                paddingLeft: () => 15,
+                paddingRight: () => 15,
+                paddingTop: () => 10,
+                paddingBottom: () => 10,
+                hLineWidth: () => 0,
+                vLineWidth: () => 0
+              },
+              alignment: 'center',
+              margin: [50, 15, 50, 15]
+            } as ContentTable;
             
           case 'strong':
           case 'b':
@@ -283,6 +314,36 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         // Continue without custom fonts
       }
 
+      // Define colors based on theme - Always use light theme for PDF export
+      const isDarkTheme = false; // Force light theme for PDF export
+      const colors = isDarkTheme ? {
+        header1: '#ffffff',
+        header2: '#ffffff', 
+        header3: '#ffffff',
+        paragraph: '#e2e8f0',
+        normal: '#ffffff',
+        link: '#60a5fa',
+        list: '#e2e8f0',
+        listItem: '#e2e8f0',
+        inlineCode: '#fbbf24',
+        codeBlockText: '#e2e8f0',
+        codeBlockBg: 'rgba(0, 0, 0, 0.3)',
+        pageBackground: '#000000'
+      } : {
+        header1: '#0f172a',
+        header2: '#1e293b',
+        header3: '#334155',
+        paragraph: '#475569',
+        normal: '#374151',
+        link: '#2563eb',
+        list: '#374151',
+        listItem: '#374151',
+        inlineCode: '#dc2626',
+        codeBlockText: '#e2e8f0',
+        codeBlockBg: '#1e293b',
+        pageBackground: '#ffffff'
+      };
+
       // Define PDF document structure (using default fonts to avoid font provider errors)
       const docDefinition: DocumentDefinition = {
         pageSize: {
@@ -294,53 +355,54 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         styles: {
           header1: {
             fontSize: 28,
-            color: '#1f2937',
+            color: colors.header1,
             alignment: 'center'
           },
           header2: {
             fontSize: 22,
-            color: '#374151',
+            color: colors.header2,
             alignment: 'center'
           },
           header3: {
             fontSize: 18,
-            color: '#4b5563',
+            color: colors.header3,
             alignment: 'center'
           },
           paragraph: {
             fontSize: 12,
-            color: '#6b7280',
+            color: colors.paragraph,
             alignment: 'center',
             lineHeight: 1.4
           },
           normal: {
             fontSize: 12,
-            color: '#374151'
+            color: colors.normal
           },
           link: {
             fontSize: 12,
-            color: '#2563eb',
+            color: colors.link,
             decoration: 'underline'
           },
           list: {
-            fontSize: 11,
-            color: '#6b7280'
+            fontSize: 12,
+            color: colors.list
           },
           listItem: {
-            fontSize: 11,
-            color: '#6b7280',
-            margin: [0, 2, 0, 2]
+            fontSize: 12,
+            color: colors.listItem,
+            margin: [0, 3, 0, 3]
           },
           inlineCode: {
             fontSize: 11,
-            color: '#dc2626',
-            background: '#f3f4f6'
+            color: colors.inlineCode,
+            background: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : '#f1f5f9'
           },
           codeBlock: {
-            fontSize: 10,
-            color: '#e5e7eb',
-            background: '#1f2937',
-            alignment: 'left'
+            fontSize: 11,
+            color: colors.codeBlockText,
+            background: colors.codeBlockBg,
+            alignment: 'left',
+            margin: [0, 15, 0, 15]
           }
         },
         defaultStyle: {
@@ -379,8 +441,22 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
           docDefinition.content.push({ text: '', pageBreak: 'before' } as PageBreak);
         }
         
+        // Add dark background for theme if enabled
+        if (isDarkTheme) {
+          docDefinition.content.push({
+            canvas: [{
+              type: 'rect',
+              x: -40,
+              y: -40,
+              w: 842, // Full page width
+              h: 595, // Full page height
+              color: colors.pageBackground
+            }]
+          } as ContentCanvas);
+        }
+        
         // Add slide background color if specified
-        if (slide.attributes?.backgroundColor) {
+        if (slide.attributes?.backgroundColor && !isDarkTheme) {
           docDefinition.content.push({
             canvas: [{
               type: 'rect',

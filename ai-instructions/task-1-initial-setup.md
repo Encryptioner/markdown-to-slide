@@ -1,7 +1,7 @@
 # Task 1: Initial Setup - Instructions
 
 ## General Rules
-1. Assess summary of your earlier tasks in `ai-summaries/task-1-initial-setup.md` file if you haven't already. And write or update the summary of your updates in that file when all the current commanded tasks/instructions are done. Keep it short. Include summary of key files changed (with info on functionality changed). You may update it in chronological way by step 1, step 2 and so on. It should reflect the continuos changes done on the codebase.
+1. Assess summary of your earlier tasks in `ai-summaries/task-1-initial-setup.md` file if you haven't already. And write or update the summary of your updates in that file when all the current commanded tasks/instructions are done. Keep it short, concise, to-the-point. Include summary of key files changed (with info on functionality changed). You may update it in chronological way by step 1, step 2 and so on. It should reflect the continuos changes done on the codebase.
 2. If the instruction lists are not chronological, fix them
 
 
@@ -237,3 +237,60 @@
 1. The error is gone. However, the content is not up to the mark.
 2. The lists, codeblock is left aligned where others are center aligned
 3. The links are also not clickable. So that, on click the link will open in new tab of browser
+
+
+## Instruction List 16
+
+### Instructions
+1. Check the comments of earlier instruction list. Fix those issue
+2. Ensure the pdf looks similar to slide preview. Check ui styling for the slide preview and apply those for PDF.
+
+### Comments
+1. Links are now clickable. However, there are other issue
+
+
+## Instruction List 17
+
+### Instructions
+1. I've added screenshots of exported PDF page here in files starts with `after_instruction_list_16` in `screenshots/task-1` folder. You will see the UI looks odd.
+2. It should look good. Every line of code shouldn't be centered. but it's container will be centered. The lists, should be in centered. The numbers and text of the list should not break
+3. The exported pdf design should match with the preview in full screen view
+4. Ensure the slide show and exported pdf supports all languages, not only english
+5. In mobile view, the slide show height is fixed in a way that, the full content is not visible. It should always be visible
+6. In full screen view, the background is black and the text is white. If the implementation auto detects browser theme and decides the color then it is ok. If not, it should auto detect browser theme and the foreground and background color should change according to light and dark theme. In full screen view, there could have a button to switch between light and dark theme.
+
+### Comments
+1. Aligning issue in PDF is not resolved
+2. Theme styling seems half baked
+
+
+## Instruction List 18
+
+### Instructions
+1. We are close. But the remaining issues are holding us back. They must need to be fixed. Think thoroughly. Research if necessary and plan carefully for no bug implementation. 
+2. Theme switching works. However, the buttons doesn't look ok in full screen. They are not clear, doesn't show icons and doesn't switch color correctly according to icons
+3. The aligning issue in pdf export is not fixed. Check the styling in full screen view on presentation mode. Then apply similar style on exported PDF. Ensure presentable PDF generation.
+
+### Comments
+1. Button in theme issue is solved. Other issue is not
+
+
+## Instruction List 19
+
+### Instructions
+1. In mobile view, the editor height is surprisingly too low. There is blank space after that
+2. In PDF, The alignment got slightly better. However, in lists, the bullet points and numbers are not on the same line of texts. But aligned left. Where the the text are centered
+3. The coding still doesn't looks ok. They are left aligned. Note that, the code as a block must be centred of page. But each line of it, don't need to be centered, but aligned left of coding block
+4. In presentation full screen, when dark mode is selected and pdf export is done, it should export the the file and it's content according to light theme. Dark theme is for presentation view only.
+5. In presentation view, after pdf export, it should be kept in it's original selected theme design
+
+### Comments
+1. Some issues are still not fixed
+
+
+## Instruction List 20
+
+### Instructions
+1. This is not fixed. It must be - In mobile view, the editor height is surprisingly too low. There is blank space after that
+2. Let's not show the bullet points in pdf export. They are continuously left aligned. In slide presentation those are also not showed
+3. Good work on handling code. However, on thing, the code as a block is not centered as page yet

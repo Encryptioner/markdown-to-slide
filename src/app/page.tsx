@@ -11,10 +11,10 @@ export default function Home() {
       
       <main className="flex-1 flex flex-col">
         <div className="flex flex-col lg:flex-row flex-1 bg-white">
-          <div className="w-full lg:w-1/2 h-[50vh] lg:h-auto lg:flex-1">
+          <div className="w-full lg:w-1/2 min-h-[50vh] lg:h-auto lg:flex-1">
             <Editor />
           </div>
-          <div className="w-full lg:w-1/2 h-[50vh] lg:h-auto lg:flex-1">
+          <div className="w-full lg:w-1/2 min-h-[50vh] lg:h-auto lg:flex-1">
             <SlidePreview />
           </div>
         </div>
