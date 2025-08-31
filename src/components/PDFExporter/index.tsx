@@ -2,16 +2,297 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { generateSlideStyles } from '@/utils/markdownParser';
 
 interface PDFExportProps {
   onClose?: () => void;
 }
 
+// Define types for pdfmake content
+interface ContentText {
+  text: string | ContentText[];
+  style?: string;
+  bold?: boolean;
+  italics?: boolean;
+  fontSize?: number;
+  color?: string;
+  alignment?: 'left' | 'center' | 'right';
+  margin?: [number, number, number, number];
+  link?: string;
+  decoration?: string;
+  preserveLeadingSpaces?: boolean;
+}
+
+interface ContentList {
+  ul?: ContentText[];
+  ol?: ContentText[];
+  style?: string;
+  margin?: [number, number, number, number];
+  alignment?: 'left' | 'center' | 'right';
+}
+
+interface ContentCanvas {
+  canvas: {
+    type: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    color: string;
+  }[];
+}
+
+interface ContentTable {
+  table: {
+    widths: string[];
+    body: ContentText[][];
+  };
+  layout: {
+    fillColor: () => string;
+    paddingLeft: () => number;
+    paddingRight: () => number;
+    paddingTop: () => number;
+    paddingBottom: () => number;
+    hLineWidth: () => number;
+    vLineWidth: () => number;
+  };
+  alignment: 'left' | 'center' | 'right';
+  margin?: [number, number, number, number];
+}
+
+interface PageBreak {
+  text: string;
+  pageBreak: 'before';
+}
+
+type Content = ContentText | ContentList | ContentCanvas | ContentTable | PageBreak;
+
+interface DocumentDefinition {
+  pageSize: {
+    width: number;
+    height: number;
+  };
+  pageMargins: [number, number, number, number];
+  content: Content[];
+  styles: {
+    [key: string]: {
+      fontSize?: number;
+      bold?: boolean;
+      color?: string;
+      alignment?: 'left' | 'center' | 'right';
+      lineHeight?: number;
+      margin?: [number, number, number, number];
+      decoration?: string;
+      background?: string;
+      font?: string;
+    };
+  };
+  defaultStyle: {
+    fontSize?: number;
+    font?: string;
+  };
+}
+
 const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
-  const { slides, currentDocument, currentSlide, setCurrentSlide } = useApp();
+  const { slides, currentDocument } = useApp();
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
+
+  // Helper function to convert HTML to pdfMake content
+  const convertHtmlToPdfMake = (htmlString: string): Content[] => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    const content: Content[] = [];
+    
+    const processNode = (node: Node): Content | Content[] | null => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent?.trim();
+        return text ? { text: text, style: 'normal' } as ContentText : null;
+      }
+      
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as Element;
+        const tagName = element.tagName.toLowerCase();
+        
+        switch (tagName) {
+          case 'h1':
+            return {
+              text: element.textContent || '',
+              style: 'header1',
+              margin: [0, 20, 0, 10],
+              alignment: 'center'
+            } as ContentText;
+            
+          case 'h2':
+            return {
+              text: element.textContent || '',
+              style: 'header2',
+              margin: [0, 15, 0, 8],
+              alignment: 'center'
+            } as ContentText;
+            
+          case 'h3':
+            return {
+              text: element.textContent || '',
+              style: 'header3',
+              margin: [0, 12, 0, 6],
+              alignment: 'center'
+            } as ContentText;
+            
+          case 'p':
+            const pContent: ContentText[] = [];
+            Array.from(element.childNodes).forEach(child => {
+              const childContent = processNode(child);
+              if (childContent && !Array.isArray(childContent)) {
+                pContent.push(childContent as ContentText);
+              }
+            });
+            return {
+              text: pContent.length > 0 ? pContent : element.textContent || '',
+              style: 'paragraph',
+              margin: [0, 5, 0, 5],
+              alignment: 'center'
+            } as ContentText;
+            
+          case 'a':
+            const href = element.getAttribute('href');
+            if (href) {
+              return {
+                text: element.textContent || href,
+                link: href,
+                style: 'link'
+              } as ContentText;
+            }
+            break;
+            
+          case 'ul':
+            const ulItems: ContentText[] = [];
+            Array.from(element.children).forEach(li => {
+              if (li.tagName.toLowerCase() === 'li') {
+                ulItems.push({
+                  text: li.textContent || '',
+                  style: 'paragraph',
+                  margin: [0, 5, 0, 5],
+                  alignment: 'center'
+                });
+              }
+            });
+            return ulItems;
+            
+          case 'ol':
+            const olItems: ContentText[] = [];
+            Array.from(element.children).forEach(li => {
+              if (li.tagName.toLowerCase() === 'li') {
+                olItems.push({
+                  text: li.textContent || '',
+                  style: 'paragraph',
+                  margin: [0, 5, 0, 5],
+                  alignment: 'center'
+                });
+              }
+            });
+            return olItems;
+            
+          case 'code':
+            const isInPre = element.closest('pre');
+            return {
+              text: element.textContent || '',
+              style: isInPre ? 'codeBlock' : 'inlineCode'
+            } as ContentText;
+            
+          case 'pre':
+            const codeContent = element.querySelector('code')?.textContent || element.textContent || '';
+            // Create a centered wrapper with left-aligned code content using proper table structure
+            return {
+              table: {
+                widths: ['*'],
+                body: [[ 
+                  {
+                    text: codeContent,
+                    style: 'codeBlock',
+                    preserveLeadingSpaces: true,
+                    alignment: 'left'
+                  }
+                ]]
+              },
+              layout: {
+                fillColor: () => '#1e293b',
+                paddingLeft: () => 15,
+                paddingRight: () => 15,
+                paddingTop: () => 12,
+                paddingBottom: () => 12,
+                hLineWidth: () => 0,
+                vLineWidth: () => 0
+              },
+              alignment: 'center',
+              margin: [80, 15, 80, 15]
+            } as ContentTable;
+            
+          case 'strong':
+          case 'b':
+            return {
+              text: element.textContent || '',
+              bold: true,
+              style: 'normal'
+            } as ContentText;
+            
+          case 'em':
+          case 'i':
+            return {
+              text: element.textContent || '',
+              italics: true,
+              style: 'normal'
+            } as ContentText;
+            
+          case 'br':
+            return { text: '\n' } as ContentText;
+            
+          case 'div':
+            const divContent: Content[] = [];
+            Array.from(element.childNodes).forEach(child => {
+              const childContent = processNode(child);
+              if (childContent) {
+                if (Array.isArray(childContent)) {
+                  divContent.push(...childContent);
+                } else {
+                  divContent.push(childContent);
+                }
+              }
+            });
+            return divContent;
+            
+          default:
+            // For unknown elements, process children
+            const unknownContent: Content[] = [];
+            Array.from(element.childNodes).forEach(child => {
+              const childContent = processNode(child);
+              if (childContent) {
+                if (Array.isArray(childContent)) {
+                  unknownContent.push(...childContent);
+                } else {
+                  unknownContent.push(childContent);
+                }
+              }
+            });
+            return unknownContent;
+        }
+      }
+      
+      return null;
+    };
+    
+    Array.from(doc.body.childNodes).forEach(node => {
+      const result = processNode(node);
+      if (result) {
+        if (Array.isArray(result)) {
+          content.push(...result);
+        } else {
+          content.push(result);
+        }
+      }
+    });
+    
+    return content;
+  };
 
   const exportToPDF = async () => {
     if (slides.length === 0) return;
@@ -20,148 +301,233 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
     setExportProgress(0);
 
     try {
-      // Dynamically import html2pdf.js to avoid SSR issues
-      const html2pdf = (await import('html2pdf.js')).default;
+      // Dynamic import to avoid SSR issues
+      const pdfMake = (await import('pdfmake/build/pdfmake')).default;
       
-      // Find the slide preview container to capture actual rendered slides
-      const slideViewer = document.querySelector('.slide-content');
-      if (!slideViewer) {
-        throw new Error('Could not find slide viewer. Please make sure slides are visible.');
-      }
-      
-      // Create container for all PDF pages
-      const pdfContainer = document.createElement('div');
-      pdfContainer.style.cssText = `
-        position: fixed;
-        left: -9999px;
-        top: 0;
-        width: 794px;
-        height: auto;
-        background: white;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        z-index: -1000;
-      `;
-      document.body.appendChild(pdfContainer);
-      
-      // Store original slide index  
-      const originalSlide = currentSlide;
-      
-      // Process each slide by temporarily switching to it
+      // Fetch and configure fonts
+      const [
+        robotoRegular,
+        robotoMedium,
+        robotoItalic,
+        robotoMediumItalic,
+        notomojiColor,
+        NotoColorEmojiRegular,
+      ] = await Promise.all([
+        fetch('/fonts/Roboto/Roboto-Regular.ttf').then(res => res.arrayBuffer()),
+        fetch('/fonts/Roboto/Roboto-Medium.ttf').then(res => res.arrayBuffer()),
+        fetch('/fonts/Roboto/Roboto-Italic.ttf').then(res => res.arrayBuffer()),
+        fetch('/fonts/Roboto/Roboto-MediumItalic.ttf').then(res => res.arrayBuffer()),
+        fetch('/fonts/NotomojiColor/NotomojiColor.ttf').then(res => res.arrayBuffer()),
+        fetch('/fonts/Noto_Color_Emoji/NotoColorEmoji-Regular.ttf').then(res => res.arrayBuffer())
+      ]);
+
+      const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+      };
+
+      pdfMake.vfs = {
+        'Roboto-Regular.ttf': arrayBufferToBase64(robotoRegular),
+        'Roboto-Medium.ttf': arrayBufferToBase64(robotoMedium),
+        'Roboto-Italic.ttf': arrayBufferToBase64(robotoItalic),
+        'Roboto-MediumItalic.ttf': arrayBufferToBase64(robotoMediumItalic),
+        'NotomojiColor.ttf': arrayBufferToBase64(notomojiColor),
+        'NotoColorEmoji-Regular.ttf': arrayBufferToBase64(NotoColorEmojiRegular),
+      };
+
+      pdfMake.fonts = {
+        Roboto: {
+          normal: 'Roboto-Regular.ttf',
+          bold: 'Roboto-Medium.ttf',
+          italics: 'Roboto-Italic.ttf',
+          bolditalics: 'Roboto-MediumItalic.ttf'
+        },
+        NotomojiColor: {
+          normal: 'NotomojiColor.ttf',
+          bold: 'NotomojiColor.ttf',
+          italics: 'NotomojiColor.ttf',
+          bolditalics: 'NotomojiColor.ttf'
+        },
+        NotoColorEmoji: {
+          normal: 'NotoColorEmoji-Regular.ttf',
+          bold: 'NotoColorEmoji-Regular.ttf',
+          italics: 'NotoColorEmoji-Regular.ttf',
+          bolditalics: 'NotoColorEmoji-Regular.ttf'
+        }
+      };
+
+      // Define colors based on theme - Always use light theme for PDF export
+      const isDarkTheme = false; // Force light theme for PDF export
+      const colors = isDarkTheme ? {
+        header1: '#ffffff',
+        header2: '#ffffff', 
+        header3: '#ffffff',
+        paragraph: '#e2e8f0',
+        normal: '#ffffff',
+        link: '#60a5fa',
+        list: '#e2e8f0',
+        listItem: '#e2e8f0',
+        inlineCode: '#fbbf24',
+        codeBlockText: '#e2e8f0',
+        codeBlockBg: 'rgba(0, 0, 0, 0.3)',
+        pageBackground: '#000000'
+      } : {
+        header1: '#0f172a',
+        header2: '#1e293b',
+        header3: '#334155',
+        paragraph: '#475569',
+        normal: '#374151',
+        link: '#2563eb',
+        list: '#374151',
+        listItem: '#374151',
+        inlineCode: '#dc2626',
+        codeBlockText: '#e2e8f0',
+        codeBlockBg: '#1e293b',
+        pageBackground: '#ffffff'
+      };
+
+      // Define PDF document structure (using default fonts to avoid font provider errors)
+      const docDefinition: DocumentDefinition = {
+        pageSize: {
+          width: 842, // A4 landscape width in points
+          height: 595  // A4 landscape height in points
+        },
+        pageMargins: [40, 40, 40, 40],
+        content: [],
+        styles: {
+          header1: {
+            fontSize: 28,
+            color: colors.header1,
+            alignment: 'center'
+          },
+          header2: {
+            fontSize: 22,
+            color: colors.header2,
+            alignment: 'center'
+          },
+          header3: {
+            fontSize: 18,
+            color: colors.header3,
+            alignment: 'center'
+          },
+          paragraph: {
+            fontSize: 12,
+            color: colors.paragraph,
+            alignment: 'center',
+            lineHeight: 1.4
+          },
+          normal: {
+            fontSize: 12,
+            color: colors.normal
+          },
+          link: {
+            fontSize: 12,
+            color: colors.link,
+            decoration: 'underline'
+          },
+          list: {
+            fontSize: 12,
+            color: colors.list
+          },
+          listItem: {
+            fontSize: 12,
+            color: colors.listItem,
+            margin: [0, 3, 0, 3]
+          },
+          inlineCode: {
+            fontSize: 11,
+            color: colors.inlineCode,
+            background: isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : '#f1f5f9'
+          },
+          codeBlock: {
+            fontSize: 11,
+            color: colors.codeBlockText,
+            background: colors.codeBlockBg,
+            alignment: 'left',
+            margin: [0, 15, 0, 15]
+          }
+        },
+        defaultStyle: {
+          fontSize: 12,
+          font: 'Roboto'
+        }
+      };
+
+      // Process each slide
       for (let slideIndex = 0; slideIndex < slides.length; slideIndex++) {
-        setExportProgress((slideIndex / slides.length) * 80); // 80% for processing slides
+        setExportProgress((slideIndex / slides.length) * 90);
         
         const slide = slides[slideIndex];
         if (!slide.content || slide.content.trim() === '') {
           continue;
         }
+
+        // Convert HTML to pdfMake content
+        const slideContent = convertHtmlToPdfMake(slide.content);
         
-        // Switch to this slide to render it properly
-        setCurrentSlide(slideIndex);
+        // Calculate content height and scale if needed (basic implementation)
+        const maxPageHeight = 515; // Available height minus margins
+        const estimatedHeight = slideContent.length * 20; // Rough estimate
         
-        // Wait for slide to render
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Create a page for this slide
-        const slidePage = document.createElement('div');
-        slidePage.style.cssText = `
-          width: 794px;
-          height: 1123px;
-          padding: 60px;
-          box-sizing: border-box;
-          background: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          page-break-after: ${slideIndex < slides.length - 1 ? 'always' : 'auto'};
-          position: relative;
-        `;
-        
-        // Apply custom slide background if any
-        const slideStyles = generateSlideStyles(slide.attributes);
-        if (slideStyles.backgroundColor) {
-          slidePage.style.backgroundColor = slideStyles.backgroundColor;
-        }
-        if (slideStyles.backgroundImage) {
-          slidePage.style.backgroundImage = slideStyles.backgroundImage;
-          slidePage.style.backgroundSize = 'cover';
-          slidePage.style.backgroundPosition = 'center';
-          slidePage.style.backgroundRepeat = 'no-repeat';
+        if (estimatedHeight > maxPageHeight) {
+          // Scale down content to fit
+          const scale = maxPageHeight / estimatedHeight;
+          slideContent.forEach((content) => {
+            if ('fontSize' in content && typeof content.fontSize === 'number') {
+              (content as ContentText).fontSize = Math.max(8, content.fontSize * scale);
+            }
+          });
         }
         
-        // Create content container
-        const contentDiv = document.createElement('div');
-        contentDiv.style.cssText = `
-          width: 100%;
-          text-align: center;
-          color: #1f2937;
-        `;
+        // Add page break for slides after the first
+        if (slideIndex > 0) {
+          docDefinition.content.push({ text: '', pageBreak: 'before' } as PageBreak);
+        }
         
-        // Copy and style the slide content
-        const processedContent = slide.content
-          .replace(/<div class="slide-content"[^>]*>/, '')
-          .replace(/<\/div>$/, '')
-          .replace(/<h1[^>]*>/g, '<h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem; color: #0f172a; text-align: center; line-height: 1.2;">')
-          .replace(/<h2[^>]*>/g, '<h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; color: #1e293b; text-align: center; line-height: 1.3;">')
-          .replace(/<h3[^>]*>/g, '<h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: #334155; text-align: center; line-height: 1.4;">')
-          .replace(/<p[^>]*>/g, '<p style="font-size: 1.25rem; line-height: 1.7; margin-bottom: 1rem; color: #475569; text-align: center;">')
-          .replace(/<ul[^>]*>/g, '<ul style="text-align: left; margin: 1rem auto; padding-left: 2rem; color: #475569; display: inline-block; font-size: 1.125rem; line-height: 1.6;">')
-          .replace(/<ol[^>]*>/g, '<ol style="text-align: left; margin: 1rem auto; padding-left: 2rem; color: #475569; display: inline-block; font-size: 1.125rem; line-height: 1.6;">')
-          .replace(/<li[^>]*>/g, '<li style="margin-bottom: 0.5rem;">')
-          .replace(/<code[^>]*>/g, '<code style="background: #f1f5f9; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-family: \'JetBrains Mono\', monospace; font-size: 0.9em; border: 1px solid #e2e8f0;">')
-          .replace(/<div class="code-wrapper">/g, '<div style="text-align: center; margin: 1.5rem 0;">')
-          .replace(/<pre[^>]*>/g, '<pre style="background: #1e293b; color: #e2e8f0; padding: 1.5rem; border-radius: 8px; font-family: \'JetBrains Mono\', monospace; font-size: 0.875rem; line-height: 1.5; text-align: left; display: inline-block; max-width: 90%; overflow-x: auto; border: 1px solid #334155; white-space: pre-wrap;">')
-          .replace(/<blockquote[^>]*>/g, '<blockquote style="border-left: 4px solid #3b82f6; background: #f8fafc; padding: 1rem 1.5rem; margin: 1.5rem auto; font-style: italic; border-radius: 4px; text-align: left; max-width: 80%; color: #475569; font-size: 1.125rem;">')
-          .replace(/<a[^>]*>/g, '<a style="color: #2563eb; text-decoration: underline; font-weight: 500;">');
+        // Add dark background for theme if enabled
+        if (isDarkTheme) {
+          docDefinition.content.push({
+            canvas: [{
+              type: 'rect',
+              x: -40,
+              y: -40,
+              w: 842, // Full page width
+              h: 595, // Full page height
+              color: colors.pageBackground
+            }]
+          } as ContentCanvas);
+        }
         
-        contentDiv.innerHTML = processedContent;
-        slidePage.appendChild(contentDiv);
-        pdfContainer.appendChild(slidePage);
-      }
-      
-      // Restore original slide
-      setCurrentSlide(originalSlide);
-      
-      if (pdfContainer.children.length === 0) {
-        throw new Error('No slides to export. Please add some content to your presentation.');
+        // Add slide background color if specified
+        if (slide.attributes?.backgroundColor && !isDarkTheme) {
+          docDefinition.content.push({
+            canvas: [{
+              type: 'rect',
+              x: 0,
+              y: 0,
+              w: 762, // Page width minus margins
+              h: 515, // Page height minus margins
+              color: slide.attributes.backgroundColor
+            }]
+          } as ContentCanvas);
+        }
+        
+        docDefinition.content.push(...slideContent);
       }
 
-      setExportProgress(85); // 85% - generating PDF
+      setExportProgress(95);
 
-      // PDF generation options
-      const options = {
-        margin: 0,
-        filename: `${currentDocument?.title || 'presentation'}.pdf`,
-        image: { 
-          type: 'jpeg', 
-          quality: 0.95 
-        },
-        html2canvas: { 
-          scale: 1.5,
-          useCORS: true,
-          letterRendering: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          width: 794,
-          height: 1123,
-          logging: false
-        },
-        jsPDF: { 
-          unit: 'px',
-          format: [794, 1123],
-          orientation: 'portrait' as const
-        },
-        pagebreak: { 
-          mode: ['css', 'legacy'] 
-        }
-      };
-
-      // Generate the PDF
-      await html2pdf().set(options).from(pdfContainer).save();
+      // Generate and download PDF
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pdfDoc = (pdfMake as any).createPdf(docDefinition);
+      pdfDoc.download(`${currentDocument?.title || 'presentation'}.pdf`);
       
       setExportProgress(100);
-      
-      // Cleanup
-      document.body.removeChild(pdfContainer);
       
     } catch (error) {
       console.error('PDF export failed:', error);
@@ -180,7 +546,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         
         {isExporting ? (
           <div className="space-y-4">
-            <p className="text-sm text-gray-600">Generating PDF...</p>
+            <p className="text-sm text-gray-600">Generating PDF with selectable text...</p>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
                 className="bg-blue-600 h-2 rounded-full transition-all duration-300"
@@ -195,7 +561,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
           <div className="space-y-4">
             <div className="text-sm text-gray-600 space-y-2">
               <p><strong>Slides to export:</strong> {slides.length}</p>
-              <p><strong>Format:</strong> PDF (A4)</p>
+              <p><strong>Format:</strong> PDF (A4) with selectable text</p>
+              <p><strong>Features:</strong> ✓ Text selection ✓ Clickable links</p>
               <p><strong>Filename:</strong> {currentDocument?.title || 'presentation'}.pdf</p>
             </div>
             

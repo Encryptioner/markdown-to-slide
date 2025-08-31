@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { ListIcon } from "@phosphor-icons/react";
 import { useApp } from '@/contexts/AppContext';
 
 const Header: React.FC = () => {
@@ -79,7 +80,7 @@ Start creating your own presentations with **Markdown to Slides**`;
         
       case 'coding':
         try {
-          const response = await fetch('/examples/markdowns/Hands on Coding of Basic Application Tools.md');
+          const response = await fetch('/markdowns/Hands on Coding of Basic Application Tools.md');
           if (response.ok) {
             exampleContent = await response.text();
           }
@@ -91,7 +92,7 @@ Start creating your own presentations with **Markdown to Slides**`;
         
       case 'automation':
         try {
-          const response = await fetch('/examples/markdowns/Automation of Daily Workflow Presentation.md');
+          const response = await fetch('/markdowns/Automation of Daily Workflow Presentation.md');
           if (response.ok) {
             exampleContent = await response.text();
           }
@@ -114,12 +115,23 @@ Start creating your own presentations with **Markdown to Slides**`;
     <header className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">
-            Markdown to Slides
-          </h1>
-          <p className="text-sm text-gray-600">
-            Create professional presentations from Markdown
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">📊</div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">
+                Markdown to Slides
+              </h1>
+              <p className="text-sm text-gray-600">
+                Create professional presentations from Markdown
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={() => document.getElementById('instructions')?.scrollIntoView({ behavior: 'smooth' })}
+            className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+          >
+            How to use →
+          </button>
         </div>
         
         <div className="hidden md:flex items-center space-x-4">
@@ -178,7 +190,7 @@ Start creating your own presentations with **Markdown to Slides**`;
             aria-label="Toggle menu"
             aria-expanded={showMenu}
           >
-            <span className="text-lg font-bold">☰</span>
+            <ListIcon className="size-6" />
           </button>
           
           {showMenu && (

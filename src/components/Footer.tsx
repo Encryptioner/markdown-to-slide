@@ -57,17 +57,32 @@ const Footer: React.FC = () => {
                 <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" />
               </svg>
             </a>
+            
+            <a
+              href="https://encryptioner.github.io/blog"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-300 hover:text-white transition-colors"
+              title="Blog"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clipRule="evenodd" />
+                <path d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V9a1 1 0 00-1-1h-1v3a2 2 0 01-2 2H5.828a1.828 1.828 0 01-1.414-.586l-1.828-1.828A1 1 0 013 9.172V7h1a2 2 0 012-2h8a2 2 0 012 2z" />
+              </svg>
+            </a>
           </div>
           
           <div className="text-sm text-gray-300">
             <p>Free & Open Source</p>
-            <p className="text-xs">MIT License</p>
           </div>
         </div>
         
         <div className="border-t border-gray-700 mt-2 pt-2 lg:mt-4 lg:pt-4 text-center">
           <p className="text-xs text-gray-400">
-            Transform your Markdown into professional presentations • No login required • Works offline
+            Transform your Markdown into professional presentations
+          </p>
+          <p className="text-xs text-gray-400">
+            No login required • Works offline
           </p>
         </div>
       </div>

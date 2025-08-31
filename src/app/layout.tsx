@@ -40,7 +40,7 @@ export default function RootLayout({
         <meta name="author" content="Ankur Mursalin" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
       </head>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning={true}>
         <AppProvider>
           {children}
         </AppProvider>

@@ -188,7 +188,7 @@ const Editor: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col border-r lg:border-r border-b lg:border-b-0 border-gray-200 bg-white">
+    <div className="w-full h-full flex flex-col bg-white border border-gray-200">
       <Toolbar
         onSave={handleSave}
         onToggleStorage={() => setShowStorage(!showStorage)}
