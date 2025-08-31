@@ -2,6 +2,28 @@
 
 This is a test presentation with emojis to verify PDF export.
 
+
+---
+
+## Basic Emojis 😊
+
+- Happy face: 😊
+- Sad face: 😢
+- Thumbs up: 👍
+- Thumbs down: 👎
+
+---
+
+## Symbol & Misc Emojis 
+
+- Copyright: ©️
+- Registered: ®️
+- Trademark: ™️
+- Check mark: ✅
+- Cross mark: ❌
+- Warning: ⚠️
+- Information: ℹ️
+
 ---
 
 ## Problematic Emojis Test
@@ -18,22 +40,15 @@ These were failing before:
 
 ---
 
-## Basic Emojis 😊
+## More Complex Emojis 🌟
 
-- Happy face: 😊
-- Sad face: 😢
-- Thumbs up: 👍
-- Thumbs down: 👎
-
----
-
-## Symbol Emojis
-
-- Copyright: ©️
-- Registered: ®️
-- Check mark: ✅
-- Cross mark: ❌
-- Warning: ⚠️
+- Woman technologist: 👩‍💻
+- Man cooking: 👨‍🍳
+- Family: 👨‍👩‍👧‍👦
+- Rainbow flag: 🏳️‍🌈
+- Fire: 🔥
+- Lightning: ⚡
+- Snowflake: ❄️
 
 ---
 
@@ -43,16 +58,16 @@ This sentence has **bold text** and emojis 🎉 mixed together!
 
 And this has *italic text* with 🌈 rainbow emoji.
 
-Code with emoji: `const party = "🎉";`
+Code with emoji: `const party = "🎉"; const rocket = "🚀";`
 
 ---
 
 ## Comprehensive Test
 
-Hearts: ❤️💙💚💛🧡💜
-Faces: 😀😃😄😁😆😅😂🤣
-Animals: 🐶🐱🐭🐹🐰🦊🐻🐼
-Food: 🍎🍊🍋🍌🍉🍇🍓🫐
+Hearts: ❤️ 💙 💚 💛 🧡 💜 🖤 🤍 🤎
+Faces: 😀 😃 😄 😁 😆 😅 😂 🤣 😊 😇
+Animals: 🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯
+Food: 🍎 🍊 🍋 🍌 🍉 🍇 🍓 🫐 🍒 🥝
 
 ---
 

@@ -104,8 +104,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
       // Modern approach using Unicode property escapes (ES2018+)
       return /\p{Extended_Pictographic}/u.test(char) || /\p{Emoji}/u.test(char);
     } catch {
-      // Fallback for older environments
-      return /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F018}-\u{1F270}]|[\u{25AA}-\u{25AB}]|[\u{25B6}]|[\u{25C0}]|[\u{25FB}-\u{25FE}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{2B50}]|[\u{2B55}]|[\u{203C}]|[\u{2049}]/u.test(char);
+      // Comprehensive fallback for older environments - covers all major emoji ranges
+      return /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F018}-\u{1F270}]|[\u{25AA}-\u{25AB}]|[\u{25B6}]|[\u{25C0}]|[\u{25FB}-\u{25FE}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{2B50}]|[\u{2B55}]|[\u{203C}]|[\u{2049}]|[\u{00A9}]|[\u{00AE}]|[\u{2122}]|[\u{2139}]|[\u{3030}]|[\u{303D}]|[\u{3297}]|[\u{3299}]|[\u{1F004}]|[\u{1F0CF}]|[\u{1F170}-\u{1F171}]|[\u{1F17E}-\u{1F17F}]|[\u{1F18E}]|[\u{1F191}-\u{1F19A}]|[\u{1F201}-\u{1F202}]|[\u{1F21A}]|[\u{1F22F}]|[\u{1F232}-\u{1F23A}]|[\u{1F250}-\u{1F251}]|[\u{231A}-\u{231B}]|[\u{2328}]|[\u{23CF}]|[\u{23E9}-\u{23F3}]|[\u{23F8}-\u{23FA}]|[\u{24C2}]|[\u{25AA}-\u{25AB}]|[\u{25B6}]|[\u{25C0}]|[\u{25FB}-\u{25FE}]|[\u{2934}-\u{2935}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{2B50}]|[\u{2B55}]/u.test(char);
     }
   };
 
@@ -152,7 +152,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
   };
 
   // Helper function to create mixed text content with proper font assignments
-  const createMixedTextContent = (text: string, baseStyle: string, alignment?: 'left' | 'center' | 'right', margin?: [number, number, number, number]): ContentText => {
+  const createMixedTextContent = (text: string, baseStyle: string, alignment?: 'left' | 'center' | 'right', margin?: [number, number, number, number], availableFonts?: Record<string, Record<string, string>>): ContentText => {
     const parts = splitTextWithEmoji(text);
     
     if (parts.length === 1 && !parts[0].isEmoji) {
@@ -165,11 +165,14 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
       } as ContentText;
     }
     
-    // Mixed content with emojis - determine which emoji font to use
+    // Determine the best emoji font to use
+    const emojiFont = availableFonts?.NotoEmoji ? 'NotoEmoji' : 'OpenSansEmoji';
+    
+    // Mixed content with emojis
     const textParts = parts.map(part => ({
       text: part.text,
       style: baseStyle,
-      font: part.isEmoji ? 'OpenSansEmoji' : 'Roboto' // Use OpenSansEmoji as reliable fallback
+      font: part.isEmoji ? emojiFont : 'Roboto'
     }));
     
     return {
@@ -181,7 +184,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
   };
 
   // Helper function to convert HTML to pdfMake content
-  const convertHtmlToPdfMake = (htmlString: string): Content[] => {
+  const convertHtmlToPdfMake = (htmlString: string, availableFonts: Record<string, Record<string, string>>): Content[] => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, 'text/html');
     const content: Content[] = [];
@@ -202,7 +205,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
               element.textContent || '',
               'header1',
               'center',
-              [0, 20, 0, 10]
+              [0, 20, 0, 10],
+              availableFonts
             );
             
           case 'h2':
@@ -210,7 +214,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
               element.textContent || '',
               'header2',
               'center',
-              [0, 15, 0, 8]
+              [0, 15, 0, 8],
+              availableFonts
             );
             
           case 'h3':
@@ -218,7 +223,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
               element.textContent || '',
               'header3',
               'center',
-              [0, 12, 0, 6]
+              [0, 12, 0, 6],
+              availableFonts
             );
             
           case 'p':
@@ -241,7 +247,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
               element.textContent || '',
               'paragraph',
               'center',
-              [0, 5, 0, 5]
+              [0, 5, 0, 5],
+              availableFonts
             );
             
           case 'a':
@@ -249,7 +256,10 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             if (href) {
               const linkContent = createMixedTextContent(
                 element.textContent || href,
-                'link'
+                'link',
+                undefined,
+                undefined,
+                availableFonts
               );
               linkContent.link = href;
               return linkContent;
@@ -264,7 +274,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
                   li.textContent || '',
                   'paragraph',
                   'center',
-                  [0, 5, 0, 5]
+                  [0, 5, 0, 5],
+                  availableFonts
                 ));
               }
             });
@@ -278,7 +289,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
                   li.textContent || '',
                   'paragraph',
                   'center',
-                  [0, 5, 0, 5]
+                  [0, 5, 0, 5],
+                  availableFonts
                 ));
               }
             });
@@ -288,7 +300,10 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             const isInPre = element.closest('pre');
             return createMixedTextContent(
               element.textContent || '',
-              isInPre ? 'codeBlock' : 'inlineCode'
+              isInPre ? 'codeBlock' : 'inlineCode',
+              undefined,
+              undefined,
+              availableFonts
             );
             
           case 'pre':
@@ -323,7 +338,10 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
           case 'b':
             const boldContent = createMixedTextContent(
               element.textContent || '',
-              'normal'
+              'normal',
+              undefined,
+              undefined,
+              availableFonts
             );
             boldContent.bold = true;
             return boldContent;
@@ -332,7 +350,10 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
           case 'i':
             const italicContent = createMixedTextContent(
               element.textContent || '',
-              'normal'
+              'normal',
+              undefined,
+              undefined,
+              availableFonts
             );
             italicContent.italics = true;
             return italicContent;
@@ -582,7 +603,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         }
 
         // Convert HTML to pdfMake content
-        const slideContent = convertHtmlToPdfMake(slide.content);
+        const slideContent = convertHtmlToPdfMake(slide.content, fontConfig);
         
         // Calculate content height and scale if needed (basic implementation)
         const maxPageHeight = 515; // Available height minus margins
