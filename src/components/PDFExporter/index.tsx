@@ -311,14 +311,12 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         robotoItalic,
         robotoMediumItalic,
         notomojiColor,
-        NotoColorEmojiRegular,
       ] = await Promise.all([
         fetch('/fonts/Roboto/Roboto-Regular.ttf').then(res => res.arrayBuffer()),
         fetch('/fonts/Roboto/Roboto-Medium.ttf').then(res => res.arrayBuffer()),
         fetch('/fonts/Roboto/Roboto-Italic.ttf').then(res => res.arrayBuffer()),
         fetch('/fonts/Roboto/Roboto-MediumItalic.ttf').then(res => res.arrayBuffer()),
         fetch('/fonts/NotomojiColor/NotomojiColor.ttf').then(res => res.arrayBuffer()),
-        fetch('/fonts/Noto_Color_Emoji/NotoColorEmoji-Regular.ttf').then(res => res.arrayBuffer())
       ]);
 
       const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
@@ -337,7 +335,6 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         'Roboto-Italic.ttf': arrayBufferToBase64(robotoItalic),
         'Roboto-MediumItalic.ttf': arrayBufferToBase64(robotoMediumItalic),
         'NotomojiColor.ttf': arrayBufferToBase64(notomojiColor),
-        'NotoColorEmoji-Regular.ttf': arrayBufferToBase64(NotoColorEmojiRegular),
       };
 
       pdfMake.fonts = {
@@ -353,12 +350,6 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
           italics: 'NotomojiColor.ttf',
           bolditalics: 'NotomojiColor.ttf'
         },
-        NotoColorEmoji: {
-          normal: 'NotoColorEmoji-Regular.ttf',
-          bold: 'NotoColorEmoji-Regular.ttf',
-          italics: 'NotoColorEmoji-Regular.ttf',
-          bolditalics: 'NotoColorEmoji-Regular.ttf'
-        }
       };
 
       // Define colors based on theme - Always use light theme for PDF export
