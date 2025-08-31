@@ -1,10 +1,11 @@
 const CACHE_NAME = 'markdown-slides-v2';
 const isProduction = self.location.hostname !== 'localhost';
+const basePublicPath = isProduction ? '/markdown-to-slide' : '';
 
 // Only cache essential files
 const urlsToCache = [
-  '/',
-  '/manifest.json'
+  `${basePublicPath}/`,
+  `${basePublicPath}/manifest.json`
 ];
 
 // Install event - cache only in production
@@ -113,7 +114,7 @@ self.addEventListener('fetch', (event) => {
             
             // Provide fallback for navigation requests
             if (request.destination === 'document') {
-              return caches.match('/').then(cachedResponse => {
+              return caches.match(`${basePublicPath}/`).then(cachedResponse => {
                 return cachedResponse || new Response(
                   '<!DOCTYPE html><html><head><title>Offline</title></head><body><h1>You are offline</h1><p>Please check your internet connection.</p></body></html>', 
                   { 

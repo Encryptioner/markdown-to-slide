@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { basePublicPath } from '@/utils/constants';
 
 interface PDFExportProps {
   onClose?: () => void;
@@ -312,11 +313,11 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         robotoMediumItalic,
         notomojiColor,
       ] = await Promise.all([
-        fetch('/fonts/Roboto/Roboto-Regular.ttf').then(res => res.arrayBuffer()),
-        fetch('/fonts/Roboto/Roboto-Medium.ttf').then(res => res.arrayBuffer()),
-        fetch('/fonts/Roboto/Roboto-Italic.ttf').then(res => res.arrayBuffer()),
-        fetch('/fonts/Roboto/Roboto-MediumItalic.ttf').then(res => res.arrayBuffer()),
-        fetch('/fonts/NotomojiColor/NotomojiColor.ttf').then(res => res.arrayBuffer()),
+        fetch(`${basePublicPath}/fonts/Roboto/Roboto-Regular.ttf`).then(res => res.arrayBuffer()),
+        fetch(`${basePublicPath}/fonts/Roboto/Roboto-Medium.ttf`).then(res => res.arrayBuffer()),
+        fetch(`${basePublicPath}/fonts/Roboto/Roboto-Italic.ttf`).then(res => res.arrayBuffer()),
+        fetch(`${basePublicPath}/fonts/Roboto/Roboto-MediumItalic.ttf`).then(res => res.arrayBuffer()),
+        fetch(`${basePublicPath}/fonts/NotomojiColor/NotomojiColor.ttf`).then(res => res.arrayBuffer()),
       ]);
 
       const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
