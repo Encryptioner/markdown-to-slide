@@ -98,36 +98,53 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
 
+  // Helper function to detect if a character is an emoji using modern Unicode property escapes
+  const isEmojiChar = (char: string): boolean => {
+    try {
+      // Modern approach using Unicode property escapes (ES2018+)
+      return /\p{Extended_Pictographic}/u.test(char) || /\p{Emoji}/u.test(char);
+    } catch {
+      // Fallback for older environments
+      return /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F018}-\u{1F270}]|[\u{25AA}-\u{25AB}]|[\u{25B6}]|[\u{25C0}]|[\u{25FB}-\u{25FE}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{2B50}]|[\u{2B55}]|[\u{203C}]|[\u{2049}]/u.test(char);
+    }
+  };
+
   // Helper function to split text into emoji and non-emoji parts
   const splitTextWithEmoji = (text: string): Array<{ text: string; isEmoji: boolean }> => {
-    const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F018}-\u{1F270}]/gu;
     const parts: Array<{ text: string; isEmoji: boolean }> = [];
-    let lastIndex = 0;
-    let match;
+    let currentText = '';
+    let currentIsEmoji = false;
+    let isFirstChar = true;
 
-    while ((match = emojiRegex.exec(text)) !== null) {
-      // Add non-emoji text before this emoji
-      if (match.index > lastIndex) {
-        parts.push({
-          text: text.slice(lastIndex, match.index),
-          isEmoji: false
-        });
+    // Split the text by characters, handling surrogate pairs properly
+    for (const char of text) {
+      const charIsEmoji = isEmojiChar(char);
+      
+      if (isFirstChar) {
+        currentText = char;
+        currentIsEmoji = charIsEmoji;
+        isFirstChar = false;
+      } else if (charIsEmoji === currentIsEmoji) {
+        // Same type, add to current part
+        currentText += char;
+      } else {
+        // Different type, save current part and start new one
+        if (currentText.trim()) {
+          parts.push({
+            text: currentText,
+            isEmoji: currentIsEmoji
+          });
+        }
+        currentText = char;
+        currentIsEmoji = charIsEmoji;
       }
-      
-      // Add the emoji
-      parts.push({
-        text: match[0],
-        isEmoji: true
-      });
-      
-      lastIndex = match.index + match[0].length;
     }
     
-    // Add remaining non-emoji text
-    if (lastIndex < text.length) {
+    // Add the last part
+    if (currentText.trim()) {
       parts.push({
-        text: text.slice(lastIndex),
-        isEmoji: false
+        text: currentText,
+        isEmoji: currentIsEmoji
       });
     }
     
@@ -148,11 +165,11 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
       } as ContentText;
     }
     
-    // Mixed content with emojis
+    // Mixed content with emojis - determine which emoji font to use
     const textParts = parts.map(part => ({
       text: part.text,
       style: baseStyle,
-      font: part.isEmoji ? 'OpenSansEmoji' : 'Roboto'
+      font: part.isEmoji ? 'OpenSansEmoji' : 'Roboto' // Use OpenSansEmoji as reliable fallback
     }));
     
     return {
@@ -381,22 +398,30 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
       // Dynamic import to avoid SSR issues
       const pdfMake = (await import('pdfmake/build/pdfmake')).default;
       
-      // Fetch and configure fonts
+      // Fetch and configure fonts with error handling
+      const fontPromises = [
+        fetch(`${basePublicPath}/fonts/Roboto/Roboto-Regular.ttf`).then(res => res.arrayBuffer()),
+        fetch(`${basePublicPath}/fonts/Roboto/Roboto-Medium.ttf`).then(res => res.arrayBuffer()),
+        fetch(`${basePublicPath}/fonts/Roboto/Roboto-Italic.ttf`).then(res => res.arrayBuffer()),
+        fetch(`${basePublicPath}/fonts/Roboto/Roboto-MediumItalic.ttf`).then(res => res.arrayBuffer()),
+        fetch(`${basePublicPath}/fonts/OpenSansEmoji/OpenSansEmoji.ttf`).then(res => res.arrayBuffer()),
+      ];
+
+      // Try to load NotoEmoji, fall back to null if it fails
+      let notoEmojiFont = null;
+      try {
+        notoEmojiFont = await fetch(`${basePublicPath}/fonts/NotoEmoji/NotoEmoji-Regular.ttf`).then(res => res.arrayBuffer());
+      } catch (error) {
+        console.warn('Failed to load NotoEmoji font, using OpenSansEmoji as fallback', error);
+      }
+
       const [
         robotoRegular,
         robotoMedium,
         robotoItalic,
         robotoMediumItalic,
-        notoColorEmoji,
         openSansEmoji,
-      ] = await Promise.all([
-        fetch(`${basePublicPath}/fonts/Roboto/Roboto-Regular.ttf`).then(res => res.arrayBuffer()),
-        fetch(`${basePublicPath}/fonts/Roboto/Roboto-Medium.ttf`).then(res => res.arrayBuffer()),
-        fetch(`${basePublicPath}/fonts/Roboto/Roboto-Italic.ttf`).then(res => res.arrayBuffer()),
-        fetch(`${basePublicPath}/fonts/Roboto/Roboto-MediumItalic.ttf`).then(res => res.arrayBuffer()),
-        fetch(`${basePublicPath}/fonts/NotomojiColor/NotomojiColor.ttf`).then(res => res.arrayBuffer()),
-        fetch(`${basePublicPath}/fonts/OpenSansEmoji/OpenSansEmoji.ttf`).then(res => res.arrayBuffer()),
-      ]);
+      ] = await Promise.all(fontPromises);
 
       const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
         let binary = '';
@@ -408,27 +433,28 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         return window.btoa(binary);
       };
 
-      pdfMake.vfs = {
+      // Build VFS with conditional NotoEmoji
+      const vfsConfig: Record<string, string> = {
         'Roboto-Regular.ttf': arrayBufferToBase64(robotoRegular),
         'Roboto-Medium.ttf': arrayBufferToBase64(robotoMedium),
         'Roboto-Italic.ttf': arrayBufferToBase64(robotoItalic),
         'Roboto-MediumItalic.ttf': arrayBufferToBase64(robotoMediumItalic),
-        'NotoColorEmoji.ttf': arrayBufferToBase64(notoColorEmoji),
         'OpenSansEmoji.ttf': arrayBufferToBase64(openSansEmoji),
       };
+      
+      if (notoEmojiFont) {
+        vfsConfig['NotoEmoji-Regular.ttf'] = arrayBufferToBase64(notoEmojiFont);
+      }
+      
+      pdfMake.vfs = vfsConfig;
 
-      pdfMake.fonts = {
+      // Build fonts configuration with conditional NotoEmoji
+      const fontConfig: Record<string, Record<string, string>> = {
         Roboto: {
           normal: 'Roboto-Regular.ttf',
           bold: 'Roboto-Medium.ttf',
           italics: 'Roboto-Italic.ttf',
           bolditalics: 'Roboto-MediumItalic.ttf'
-        },
-        NotoColorEmoji: {
-          normal: 'NotoColorEmoji.ttf',
-          bold: 'NotoColorEmoji.ttf',
-          italics: 'NotoColorEmoji.ttf',
-          bolditalics: 'NotoColorEmoji.ttf'
         },
         OpenSansEmoji: {
           normal: 'OpenSansEmoji.ttf',
@@ -437,6 +463,17 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
           bolditalics: 'OpenSansEmoji.ttf'
         },
       };
+      
+      if (notoEmojiFont) {
+        fontConfig.NotoEmoji = {
+          normal: 'NotoEmoji-Regular.ttf',
+          bold: 'NotoEmoji-Regular.ttf',
+          italics: 'NotoEmoji-Regular.ttf',
+          bolditalics: 'NotoEmoji-Regular.ttf'
+        };
+      }
+      
+      pdfMake.fonts = fontConfig;
 
       // Define colors based on theme - Always use light theme for PDF export
       const isDarkTheme = false; // Force light theme for PDF export

@@ -104,7 +104,7 @@ Start creating your own presentations with **Markdown to Slides**`;
         break;
       case 'emoji':
         try {
-          const response = await fetch(`${basePublicPath}/markdowns/Test Emoji.md`);
+          const response = await fetch(`${basePublicPath}/markdowns/Emoji Testing.md`);
           if (response.ok) {
             exampleContent = await response.text();
           }
@@ -184,7 +184,7 @@ Start creating your own presentations with **Markdown to Slides**`;
                     className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                     type="button"
                   >
-                    Test Emoji
+                    Emoji Testing
                   </button>
                 </div>
               </div>
@@ -244,7 +244,7 @@ Start creating your own presentations with **Markdown to Slides**`;
                   className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                   type="button"
                 >
-                  Test Emoji
+                  Emoji Testing
                 </button>
                 <div className="border-t border-gray-100 mt-2 pt-2">
                   <a
