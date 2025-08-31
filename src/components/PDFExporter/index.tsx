@@ -97,49 +97,6 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
 
-  // Helper function to handle emoji encoding for PDF
-  const handleEmojiText = (text: string): string => {
-    // Enhanced emoji handling with fallback mapping
-    const emojiMap: Record<string, string> = {
-      '👍': '👍',
-      '❤️': '♥',
-      '😊': '😊',
-      '🎉': '★',
-      '✅': '✓',
-      '❌': '✗',
-      '⭐': '★',
-      '🔥': '★',
-      '💡': '!',
-      '📝': '※',
-      '🚀': '^',
-      '💻': '[PC]',
-      '📱': '[Mobile]',
-      '🌟': '★',
-      '💼': '[Work]',
-      '🎯': '[Target]',
-      '📊': '[Chart]'
-    };
-    
-    let result = text;
-    
-    // Replace specific emojis with alternatives
-    Object.entries(emojiMap).forEach(([emoji, replacement]) => {
-      result = result.replace(new RegExp(emoji, 'g'), replacement);
-    });
-    
-    // Replace remaining complex emojis with simple alternatives
-    result = result
-      .replace(/[\u{1F600}-\u{1F64F}]/gu, '😊') // Emoticons -> generic smile
-      .replace(/[\u{1F300}-\u{1F5FF}]/gu, '★') // Symbols -> star
-      .replace(/[\u{1F680}-\u{1F6FF}]/gu, '^') // Transport -> arrow
-      .replace(/[\u{2600}-\u{26FF}]/gu, '★') // Misc symbols -> star
-      .replace(/[\u{2700}-\u{27BF}]/gu, '★') // Dingbats -> star
-      // Ensure proper normalization
-      .normalize('NFC');
-    
-    return result;
-  };
-
   // Helper function to convert HTML to pdfMake content
   const convertHtmlToPdfMake = (htmlString: string): Content[] => {
     const parser = new DOMParser();
@@ -149,7 +106,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
     const processNode = (node: Node): Content | Content[] | null => {
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent?.trim();
-        return text ? { text: handleEmojiText(text), style: 'normal' } as ContentText : null;
+        return text ? { text: text, style: 'normal' } as ContentText : null;
       }
       
       if (node.nodeType === Node.ELEMENT_NODE) {
@@ -159,7 +116,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         switch (tagName) {
           case 'h1':
             return {
-              text: handleEmojiText(element.textContent || ''),
+              text: element.textContent || '',
               style: 'header1',
               margin: [0, 20, 0, 10],
               alignment: 'center'
@@ -167,7 +124,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             
           case 'h2':
             return {
-              text: handleEmojiText(element.textContent || ''),
+              text: element.textContent || '',
               style: 'header2',
               margin: [0, 15, 0, 8],
               alignment: 'center'
@@ -175,7 +132,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             
           case 'h3':
             return {
-              text: handleEmojiText(element.textContent || ''),
+              text: element.textContent || '',
               style: 'header3',
               margin: [0, 12, 0, 6],
               alignment: 'center'
@@ -190,7 +147,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
               }
             });
             return {
-              text: pContent.length > 0 ? pContent : handleEmojiText(element.textContent || ''),
+              text: pContent.length > 0 ? pContent : element.textContent || '',
               style: 'paragraph',
               margin: [0, 5, 0, 5],
               alignment: 'center'
@@ -200,7 +157,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             const href = element.getAttribute('href');
             if (href) {
               return {
-                text: handleEmojiText(element.textContent || href),
+                text: element.textContent || href,
                 link: href,
                 style: 'link'
               } as ContentText;
@@ -212,7 +169,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             Array.from(element.children).forEach(li => {
               if (li.tagName.toLowerCase() === 'li') {
                 ulItems.push({
-                  text: handleEmojiText(li.textContent || ''),
+                  text: li.textContent || '',
                   style: 'paragraph',
                   margin: [0, 5, 0, 5],
                   alignment: 'center'
@@ -226,7 +183,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             Array.from(element.children).forEach(li => {
               if (li.tagName.toLowerCase() === 'li') {
                 olItems.push({
-                  text: handleEmojiText(li.textContent || ''),
+                  text: li.textContent || '',
                   style: 'paragraph',
                   margin: [0, 5, 0, 5],
                   alignment: 'center'
@@ -248,7 +205,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             return {
               table: {
                 widths: ['*'],
-                body: [[
+                body: [[ 
                   {
                     text: codeContent,
                     style: 'codeBlock',
@@ -273,7 +230,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
           case 'strong':
           case 'b':
             return {
-              text: handleEmojiText(element.textContent || ''),
+              text: element.textContent || '',
               bold: true,
               style: 'normal'
             } as ContentText;
@@ -281,7 +238,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
           case 'em':
           case 'i':
             return {
-              text: handleEmojiText(element.textContent || ''),
+              text: element.textContent || '',
               italics: true,
               style: 'normal'
             } as ContentText;
@@ -346,18 +303,63 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
     try {
       // Dynamic import to avoid SSR issues
       const pdfMake = (await import('pdfmake/build/pdfmake')).default;
-      const pdfFonts = await import('pdfmake/build/vfs_fonts');
       
-      // Configure fonts with proper error handling
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const fontsVfs = (pdfFonts as any).pdfMake?.vfs || (pdfFonts as any).vfs || {};
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (pdfMake as any).vfs = fontsVfs;
-      } catch (fontError) {
-        console.warn('Could not load PDF fonts, using default fonts:', fontError);
-        // Continue without custom fonts
-      }
+      // Fetch and configure fonts
+      const [
+        robotoRegular,
+        robotoMedium,
+        robotoItalic,
+        robotoMediumItalic,
+        notomojiColor,
+        NotoColorEmojiRegular,
+      ] = await Promise.all([
+        fetch('/fonts/Roboto/Roboto-Regular.ttf').then(res => res.arrayBuffer()),
+        fetch('/fonts/Roboto/Roboto-Medium.ttf').then(res => res.arrayBuffer()),
+        fetch('/fonts/Roboto/Roboto-Italic.ttf').then(res => res.arrayBuffer()),
+        fetch('/fonts/Roboto/Roboto-MediumItalic.ttf').then(res => res.arrayBuffer()),
+        fetch('/fonts/NotomojiColor/NotomojiColor.ttf').then(res => res.arrayBuffer()),
+        fetch('/fonts/Noto_Color_Emoji/NotoColorEmoji-Regular.ttf').then(res => res.arrayBuffer())
+      ]);
+
+      const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+      };
+
+      pdfMake.vfs = {
+        'Roboto-Regular.ttf': arrayBufferToBase64(robotoRegular),
+        'Roboto-Medium.ttf': arrayBufferToBase64(robotoMedium),
+        'Roboto-Italic.ttf': arrayBufferToBase64(robotoItalic),
+        'Roboto-MediumItalic.ttf': arrayBufferToBase64(robotoMediumItalic),
+        'NotomojiColor.ttf': arrayBufferToBase64(notomojiColor),
+        'NotoColorEmoji-Regular.ttf': arrayBufferToBase64(NotoColorEmojiRegular),
+      };
+
+      pdfMake.fonts = {
+        Roboto: {
+          normal: 'Roboto-Regular.ttf',
+          bold: 'Roboto-Medium.ttf',
+          italics: 'Roboto-Italic.ttf',
+          bolditalics: 'Roboto-MediumItalic.ttf'
+        },
+        NotomojiColor: {
+          normal: 'NotomojiColor.ttf',
+          bold: 'NotomojiColor.ttf',
+          italics: 'NotomojiColor.ttf',
+          bolditalics: 'NotomojiColor.ttf'
+        },
+        NotoColorEmoji: {
+          normal: 'NotoColorEmoji-Regular.ttf',
+          bold: 'NotoColorEmoji-Regular.ttf',
+          italics: 'NotoColorEmoji-Regular.ttf',
+          bolditalics: 'NotoColorEmoji-Regular.ttf'
+        }
+      };
 
       // Define colors based on theme - Always use light theme for PDF export
       const isDarkTheme = false; // Force light theme for PDF export
@@ -451,7 +453,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
           }
         },
         defaultStyle: {
-          fontSize: 12
+          fontSize: 12,
+          font: 'Roboto'
         }
       };
 

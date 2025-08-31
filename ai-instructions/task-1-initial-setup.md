@@ -335,6 +335,21 @@
 3. Will fix something on my own. Will also add some individual commands.
 4. Own fixes:
    - Editor height issue in mobile
+   - Increased margin in coding block in pdf export
+   - Tried to use imported fonts for emoji in pdf export. However, it didn't worked
 5. Commands:
    - Shorten the full @ai-summaries/task-1-initial-setup.md Keep only the necessary points. The steps are ok. however, final summary seems too long. Read the full page and make it short, concise, to-the-point
-   - It became too short. I need the key file info and others. Just remove the redundant part. Each steps seems making 4 segements. make two segment.And don't squeeze multiple steps togethere 
+   - It became too short. I need the key file info and others. Just remove the redundant part. Each steps seems making 4 segements. make two segment.And don't squeeze multiple steps together
+   - Handle the backtick `` for texts similar to markdown. So that looks special in pdf
+   - Discarding the changes. It makes break current styling. It is not that important. So, skipping it
+   - Fix emoji issue. Here is some suggestion.
+       1. Use a Unicode-Friendly Font:
+       Ensure your document uses a font that fully supports color emojis, such as Noto Color Emoji, and then embed that font into your PDF. 
+       2. Embed Fonts:
+       When exporting to PDF, look for an option to embed fonts. This ensures the font, including its emoji characters, is included in the PDF file.
+       3. Use Unicode Escape Codes:
+       For text-based documents, use the character's Unicode escape code (e.g., =CHAR(128522) for a smiley) instead of copy-pasting an emoji directly, as PDFs often render these more reliably
+   - Got error like below while exporting pdf. Ensure all the fonts are present
+    (index):1 Uncaught (in promise) File 'data/Helvetica.afm' not found in virtual file system
+   - The emoji still doesn't show. It shows some X type design. In some place it shows [PC] after X type txt.
+   - [It used text alternative instead of emoji. Said I want to show the emojis]
