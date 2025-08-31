@@ -98,6 +98,71 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
 
+  // Helper function to split text into emoji and non-emoji parts
+  const splitTextWithEmoji = (text: string): Array<{ text: string; isEmoji: boolean }> => {
+    const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F018}-\u{1F270}]/gu;
+    const parts: Array<{ text: string; isEmoji: boolean }> = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = emojiRegex.exec(text)) !== null) {
+      // Add non-emoji text before this emoji
+      if (match.index > lastIndex) {
+        parts.push({
+          text: text.slice(lastIndex, match.index),
+          isEmoji: false
+        });
+      }
+      
+      // Add the emoji
+      parts.push({
+        text: match[0],
+        isEmoji: true
+      });
+      
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Add remaining non-emoji text
+    if (lastIndex < text.length) {
+      parts.push({
+        text: text.slice(lastIndex),
+        isEmoji: false
+      });
+    }
+    
+    return parts.filter(part => part.text.length > 0);
+  };
+
+  // Helper function to create mixed text content with proper font assignments
+  const createMixedTextContent = (text: string, baseStyle: string, alignment?: 'left' | 'center' | 'right', margin?: [number, number, number, number]): ContentText => {
+    const parts = splitTextWithEmoji(text);
+    
+    if (parts.length === 1 && !parts[0].isEmoji) {
+      // No emoji, return simple text
+      return {
+        text: text,
+        style: baseStyle,
+        alignment: alignment,
+        margin: margin
+      } as ContentText;
+    }
+    
+    // Mixed content with emojis
+    const textParts = parts.map(part => ({
+      text: part.text,
+      style: baseStyle,
+      font: part.isEmoji ? 'OpenSansEmoji' : 'Roboto'
+    }));
+    
+    return {
+      text: textParts,
+      style: baseStyle,
+      alignment: alignment,
+      margin: margin
+    } as ContentText;
+  };
+
   // Helper function to convert HTML to pdfMake content
   const convertHtmlToPdfMake = (htmlString: string): Content[] => {
     const parser = new DOMParser();
@@ -116,28 +181,28 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         
         switch (tagName) {
           case 'h1':
-            return {
-              text: element.textContent || '',
-              style: 'header1',
-              margin: [0, 20, 0, 10],
-              alignment: 'center'
-            } as ContentText;
+            return createMixedTextContent(
+              element.textContent || '',
+              'header1',
+              'center',
+              [0, 20, 0, 10]
+            );
             
           case 'h2':
-            return {
-              text: element.textContent || '',
-              style: 'header2',
-              margin: [0, 15, 0, 8],
-              alignment: 'center'
-            } as ContentText;
+            return createMixedTextContent(
+              element.textContent || '',
+              'header2',
+              'center',
+              [0, 15, 0, 8]
+            );
             
           case 'h3':
-            return {
-              text: element.textContent || '',
-              style: 'header3',
-              margin: [0, 12, 0, 6],
-              alignment: 'center'
-            } as ContentText;
+            return createMixedTextContent(
+              element.textContent || '',
+              'header3',
+              'center',
+              [0, 12, 0, 6]
+            );
             
           case 'p':
             const pContent: ContentText[] = [];
@@ -147,21 +212,30 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
                 pContent.push(childContent as ContentText);
               }
             });
-            return {
-              text: pContent.length > 0 ? pContent : element.textContent || '',
-              style: 'paragraph',
-              margin: [0, 5, 0, 5],
-              alignment: 'center'
-            } as ContentText;
+            if (pContent.length > 0) {
+              return {
+                text: pContent,
+                style: 'paragraph',
+                margin: [0, 5, 0, 5],
+                alignment: 'center'
+              } as ContentText;
+            }
+            return createMixedTextContent(
+              element.textContent || '',
+              'paragraph',
+              'center',
+              [0, 5, 0, 5]
+            );
             
           case 'a':
             const href = element.getAttribute('href');
             if (href) {
-              return {
-                text: element.textContent || href,
-                link: href,
-                style: 'link'
-              } as ContentText;
+              const linkContent = createMixedTextContent(
+                element.textContent || href,
+                'link'
+              );
+              linkContent.link = href;
+              return linkContent;
             }
             break;
             
@@ -169,12 +243,12 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             const ulItems: ContentText[] = [];
             Array.from(element.children).forEach(li => {
               if (li.tagName.toLowerCase() === 'li') {
-                ulItems.push({
-                  text: li.textContent || '',
-                  style: 'paragraph',
-                  margin: [0, 5, 0, 5],
-                  alignment: 'center'
-                });
+                ulItems.push(createMixedTextContent(
+                  li.textContent || '',
+                  'paragraph',
+                  'center',
+                  [0, 5, 0, 5]
+                ));
               }
             });
             return ulItems;
@@ -183,22 +257,22 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             const olItems: ContentText[] = [];
             Array.from(element.children).forEach(li => {
               if (li.tagName.toLowerCase() === 'li') {
-                olItems.push({
-                  text: li.textContent || '',
-                  style: 'paragraph',
-                  margin: [0, 5, 0, 5],
-                  alignment: 'center'
-                });
+                olItems.push(createMixedTextContent(
+                  li.textContent || '',
+                  'paragraph',
+                  'center',
+                  [0, 5, 0, 5]
+                ));
               }
             });
             return olItems;
             
           case 'code':
             const isInPre = element.closest('pre');
-            return {
-              text: element.textContent || '',
-              style: isInPre ? 'codeBlock' : 'inlineCode'
-            } as ContentText;
+            return createMixedTextContent(
+              element.textContent || '',
+              isInPre ? 'codeBlock' : 'inlineCode'
+            );
             
           case 'pre':
             const codeContent = element.querySelector('code')?.textContent || element.textContent || '';
@@ -230,19 +304,21 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             
           case 'strong':
           case 'b':
-            return {
-              text: element.textContent || '',
-              bold: true,
-              style: 'normal'
-            } as ContentText;
+            const boldContent = createMixedTextContent(
+              element.textContent || '',
+              'normal'
+            );
+            boldContent.bold = true;
+            return boldContent;
             
           case 'em':
           case 'i':
-            return {
-              text: element.textContent || '',
-              italics: true,
-              style: 'normal'
-            } as ContentText;
+            const italicContent = createMixedTextContent(
+              element.textContent || '',
+              'normal'
+            );
+            italicContent.italics = true;
+            return italicContent;
             
           case 'br':
             return { text: '\n' } as ContentText;
@@ -311,13 +387,15 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         robotoMedium,
         robotoItalic,
         robotoMediumItalic,
-        notomojiColor,
+        notoColorEmoji,
+        openSansEmoji,
       ] = await Promise.all([
         fetch(`${basePublicPath}/fonts/Roboto/Roboto-Regular.ttf`).then(res => res.arrayBuffer()),
         fetch(`${basePublicPath}/fonts/Roboto/Roboto-Medium.ttf`).then(res => res.arrayBuffer()),
         fetch(`${basePublicPath}/fonts/Roboto/Roboto-Italic.ttf`).then(res => res.arrayBuffer()),
         fetch(`${basePublicPath}/fonts/Roboto/Roboto-MediumItalic.ttf`).then(res => res.arrayBuffer()),
         fetch(`${basePublicPath}/fonts/NotomojiColor/NotomojiColor.ttf`).then(res => res.arrayBuffer()),
+        fetch(`${basePublicPath}/fonts/OpenSansEmoji/OpenSansEmoji.ttf`).then(res => res.arrayBuffer()),
       ]);
 
       const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
@@ -335,7 +413,8 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
         'Roboto-Medium.ttf': arrayBufferToBase64(robotoMedium),
         'Roboto-Italic.ttf': arrayBufferToBase64(robotoItalic),
         'Roboto-MediumItalic.ttf': arrayBufferToBase64(robotoMediumItalic),
-        'NotomojiColor.ttf': arrayBufferToBase64(notomojiColor),
+        'NotoColorEmoji.ttf': arrayBufferToBase64(notoColorEmoji),
+        'OpenSansEmoji.ttf': arrayBufferToBase64(openSansEmoji),
       };
 
       pdfMake.fonts = {
@@ -345,11 +424,17 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
           italics: 'Roboto-Italic.ttf',
           bolditalics: 'Roboto-MediumItalic.ttf'
         },
-        NotomojiColor: {
-          normal: 'NotomojiColor.ttf',
-          bold: 'NotomojiColor.ttf',
-          italics: 'NotomojiColor.ttf',
-          bolditalics: 'NotomojiColor.ttf'
+        NotoColorEmoji: {
+          normal: 'NotoColorEmoji.ttf',
+          bold: 'NotoColorEmoji.ttf',
+          italics: 'NotoColorEmoji.ttf',
+          bolditalics: 'NotoColorEmoji.ttf'
+        },
+        OpenSansEmoji: {
+          normal: 'OpenSansEmoji.ttf',
+          bold: 'OpenSansEmoji.ttf',
+          italics: 'OpenSansEmoji.ttf',
+          bolditalics: 'OpenSansEmoji.ttf'
         },
       };
 

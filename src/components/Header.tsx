@@ -102,6 +102,17 @@ Start creating your own presentations with **Markdown to Slides**`;
           exampleContent = '# Error loading example\n\nFailed to load the workflow automation presentation example.';
         }
         break;
+      case 'emoji':
+        try {
+          const response = await fetch(`${basePublicPath}/markdowns/Test Emoji.md`);
+          if (response.ok) {
+            exampleContent = await response.text();
+          }
+        } catch (error) {
+          console.error('Failed to load emoji example:', error);
+          exampleContent = '# Error loading example\n\nFailed to load the test emoji presentation example.';
+        }
+        break;
     }
 
     if (exampleContent) {
@@ -168,6 +179,13 @@ Start creating your own presentations with **Markdown to Slides**`;
                   >
                     Workflow Automation
                   </button>
+                  <button
+                    onClick={() => loadExample('emoji')}
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
+                    type="button"
+                  >
+                    Test Emoji
+                  </button>
                 </div>
               </div>
             )}
@@ -220,6 +238,13 @@ Start creating your own presentations with **Markdown to Slides**`;
                   type="button"
                 >
                   Workflow Automation
+                </button>
+                <button
+                  onClick={() => loadExample('emoji')}
+                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
+                  type="button"
+                >
+                  Test Emoji
                 </button>
                 <div className="border-t border-gray-100 mt-2 pt-2">
                   <a
