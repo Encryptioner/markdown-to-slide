@@ -19,7 +19,7 @@ const SlideNavigation: React.FC<SlideNavigationProps> = ({
         <button
           key={index}
           onClick={() => onSlideSelect(index)}
-          className={`w-3 h-3 rounded-full transition-colors ${
+          className={`w-3 h-3 rounded-full transition-colors cursor-pointer ${
             index === currentSlide
               ? 'bg-white'
               : 'bg-white bg-opacity-50 hover:bg-opacity-75'

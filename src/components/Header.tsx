@@ -129,7 +129,7 @@ Start creating your own presentations with **Markdown to Slides**`;
           </div>
           <button 
             onClick={() => document.getElementById('instructions')?.scrollIntoView({ behavior: 'smooth' })}
-            className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+            className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline cursor-pointer"
           >
             How to use →
           </button>
@@ -139,7 +139,7 @@ Start creating your own presentations with **Markdown to Slides**`;
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded hover:bg-gray-50"
+              className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer"
             >
               📖 Examples
             </button>
@@ -149,21 +149,21 @@ Start creating your own presentations with **Markdown to Slides**`;
                 <div className="py-2">
                   <button
                     onClick={() => loadExample('basic')}
-                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                     type="button"
                   >
                     Basic Presentation
                   </button>
                   <button
                     onClick={() => loadExample('coding')}
-                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                     type="button"
                   >
                     Coding Tools Presentation
                   </button>
                   <button
                     onClick={() => loadExample('automation')}
-                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                     type="button"
                   >
                     Workflow Automation
@@ -177,7 +177,7 @@ Start creating your own presentations with **Markdown to Slides**`;
             href="https://github.com/Encryptioner/markdown-to-slide"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-2 text-sm text-white bg-gray-900 rounded hover:bg-gray-800"
+            className="px-3 py-2 text-sm text-white bg-gray-900 rounded hover:bg-gray-800 cursor-pointer"
           >
             ⭐ Star on GitHub
           </a>
@@ -186,7 +186,7 @@ Start creating your own presentations with **Markdown to Slides**`;
         <div className="md:hidden relative" ref={mobileMenuRef}>
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
+            className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded cursor-pointer"
             type="button"
             aria-label="Toggle menu"
             aria-expanded={showMenu}
@@ -202,21 +202,21 @@ Start creating your own presentations with **Markdown to Slides**`;
                 </div>
                 <button
                   onClick={() => loadExample('basic')}
-                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                   type="button"
                 >
                   Basic Presentation
                 </button>
                 <button
                   onClick={() => loadExample('coding')}
-                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                   type="button"
                 >
                   Coding Tools Presentation
                 </button>
                 <button
                   onClick={() => loadExample('automation')}
-                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                   type="button"
                 >
                   Workflow Automation

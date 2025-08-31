@@ -128,14 +128,14 @@ const SlidePreview: React.FC = () => {
           <div className="absolute top-4 right-4 flex gap-2">
             <button
               onClick={() => setIsDarkTheme(!isDarkTheme)}
-              className={`p-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200`}
+              className={`p-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200 cursor-pointer`}
               title="Toggle theme"
             >
               <span className="text-lg">{isDarkTheme ? '☀️' : '🌙'}</span>
             </button>
             <button
               onClick={() => setShowPDFExport(true)}
-              className={`px-4 py-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium`}
+              className={`px-4 py-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium cursor-pointer`}
               title="Export PDF"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -146,7 +146,7 @@ const SlidePreview: React.FC = () => {
             <button
               onClick={handlePrevSlide}
               disabled={currentSlide === 0}
-              className={`p-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200 disabled:opacity-30`}
+              className={`p-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200 disabled:opacity-30 cursor-pointer`}
               title="Previous slide (←)"
             >
               <span className="text-lg">←</span>
@@ -154,14 +154,14 @@ const SlidePreview: React.FC = () => {
             <button
               onClick={handleNextSlide}
               disabled={currentSlide === slides.length - 1}
-              className={`p-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200 disabled:opacity-30`}
+              className={`p-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200 disabled:opacity-30 cursor-pointer`}
               title="Next slide (→)"
             >
               <span className="text-lg">→</span>
             </button>
             <button
               onClick={() => setFullscreen(false)}
-              className={`p-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200`}
+              className={`p-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200 cursor-pointer`}
               title="Exit fullscreen (Esc)"
             >
               <span className="text-lg">✕</span>

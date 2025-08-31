@@ -561,14 +561,14 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
             <div className="flex flex-col sm:flex-row gap-3 justify-end">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors order-2 sm:order-1"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors cursor-pointer order-2 sm:order-1"
                 type="button"
               >
                 Cancel
               </button>
               <button
                 onClick={exportToPDF}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors order-1 sm:order-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors cursor-pointer order-1 sm:order-2"
                 type="button"
               >
                 📄 Export PDF

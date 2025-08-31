@@ -43,7 +43,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           <button
             key={index}
             onClick={tool.action}
-            className={`px-2 md:px-3 py-1 text-xs md:text-sm rounded hover:bg-gray-200 transition-colors whitespace-nowrap ${tool.className || ''}`}
+            className={`px-2 md:px-3 py-1 text-xs md:text-sm rounded hover:bg-gray-200 transition-colors whitespace-nowrap cursor-pointer ${tool.className || ''}`}
             title={tool.title}
           >
             {tool.label}
@@ -57,7 +57,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
             onClick={onUndo}
             disabled={!canUndo}
             className={`px-2 md:px-3 py-1 text-xs md:text-sm rounded transition-colors ${
-              canUndo ? 'hover:bg-gray-200' : 'opacity-50 cursor-not-allowed'
+              canUndo ? 'hover:bg-gray-200 cursor-pointer' : 'opacity-50 cursor-not-allowed'
             }`}
             title="Undo (Ctrl+Z)"
           >
@@ -70,7 +70,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
             onClick={onRedo}
             disabled={!canRedo}
             className={`px-2 md:px-3 py-1 text-xs md:text-sm rounded transition-colors ${
-              canRedo ? 'hover:bg-gray-200' : 'opacity-50 cursor-not-allowed'
+              canRedo ? 'hover:bg-gray-200 cursor-pointer' : 'opacity-50 cursor-not-allowed'
             }`}
             title="Redo (Ctrl+Y)"
           >
@@ -82,7 +82,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         
         <button
           onClick={onToggleStorage}
-          className={`px-2 md:px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+          className={`px-2 md:px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
             showStorage ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-200'
           }`}
           title="Toggle Storage Panel"
@@ -93,7 +93,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
         
         <button
           onClick={onSave}
-          className="px-2 md:px-4 py-1 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          className="px-2 md:px-4 py-1 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
           title="Save (Ctrl+S)"
         >
           <span className="hidden sm:inline">💾 Save</span>

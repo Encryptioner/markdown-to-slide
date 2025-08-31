@@ -31,7 +31,7 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({
           <button
             onClick={onPrev}
             disabled={!canGoPrev}
-            className="px-3 py-1 text-sm rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-3 py-1 text-sm rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
             title="Previous slide"
           >
             ← Prev
@@ -44,7 +44,7 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({
           <button
             onClick={onNext}
             disabled={!canGoNext}
-            className="px-3 py-1 text-sm rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-3 py-1 text-sm rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
             title="Next slide"
           >
             Next →
@@ -54,7 +54,7 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowPDFExport(true)}
-            className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+            className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer"
             title="Export to PDF"
           >
             📄 PDF
@@ -62,7 +62,7 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({
           
           <button
             onClick={onFullscreen}
-            className="px-4 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+            className="px-4 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors cursor-pointer"
             title="Present (F11)"
           >
             🎬 Present

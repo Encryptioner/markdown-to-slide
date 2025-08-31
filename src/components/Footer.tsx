@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
                 href="https://encryptioner.github.io/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300"
+                className="text-blue-400 hover:text-blue-300 cursor-pointer"
               >
                 Ankur Mursalin
               </a>
@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
               href="https://github.com/Encryptioner/markdown-to-slide"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition-colors"
+              className="text-gray-300 hover:text-white transition-colors cursor-pointer"
               title="View on GitHub"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -38,7 +38,7 @@ const Footer: React.FC = () => {
               href="https://linkedin.com/in/ankur-mursalin"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition-colors"
+              className="text-gray-300 hover:text-white transition-colors cursor-pointer"
               title="LinkedIn Profile"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -50,7 +50,7 @@ const Footer: React.FC = () => {
               href="https://twitter.com/encryptioner"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition-colors"
+              className="text-gray-300 hover:text-white transition-colors cursor-pointer"
               title="Twitter Profile"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -62,7 +62,7 @@ const Footer: React.FC = () => {
               href="https://encryptioner.github.io/blog"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition-colors"
+              className="text-gray-300 hover:text-white transition-colors cursor-pointer"
               title="Blog"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

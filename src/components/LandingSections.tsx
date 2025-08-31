@@ -15,7 +15,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, children
     <div className="border border-gray-200 rounded-lg mb-4">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-6 py-4 text-left bg-gray-50 hover:bg-gray-100 rounded-t-lg transition-colors flex items-center justify-between"
+        className="w-full px-6 py-4 text-left bg-gray-50 hover:bg-gray-100 rounded-t-lg transition-colors flex items-center justify-between cursor-pointer"
         type="button"
       >
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
