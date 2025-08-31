@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: "Markdown to Slides",
     description: "Create professional presentations from Markdown",
   },
-  manifest: `${basePublicPath}/manifest.json`,
+  manifest: "/manifest.json",
 };
 
 export const viewport = {
@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="manifest" href={`${basePublicPath}/manifest.json`} />
+        <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
         <meta name="author" content="Ankur Mursalin" />
         <link rel="apple-touch-icon" href={`${basePublicPath}/icons/icon-192x192.svg`} />
