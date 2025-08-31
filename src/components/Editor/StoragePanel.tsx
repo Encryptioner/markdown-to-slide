@@ -73,7 +73,7 @@ const StoragePanel: React.FC<StoragePanelProps> = ({ onClose }) => {
         <h3 className="font-semibold text-gray-800">Saved Presentations</h3>
         <button
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-700 text-lg leading-none"
+          className="text-gray-500 hover:text-gray-700 text-lg leading-none cursor-pointer"
           title="Close"
         >
           ×
@@ -113,13 +113,13 @@ const StoragePanel: React.FC<StoragePanelProps> = ({ onClose }) => {
                       <div className="flex gap-1 mt-2">
                         <button
                           onClick={() => handleRename(document.id)}
-                          className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                          className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
                         >
                           Save
                         </button>
                         <button
                           onClick={cancelRename}
-                          className="px-2 py-1 text-xs text-gray-600 hover:text-gray-800"
+                          className="px-2 py-1 text-xs text-gray-600 hover:text-gray-800 cursor-pointer"
                         >
                           Cancel
                         </button>
@@ -137,14 +137,14 @@ const StoragePanel: React.FC<StoragePanelProps> = ({ onClose }) => {
                       <div className="flex gap-1">
                         <button
                           onClick={() => startRename(document)}
-                          className="text-gray-500 hover:text-gray-700 text-sm leading-none"
+                          className="text-gray-500 hover:text-gray-700 text-sm leading-none cursor-pointer"
                           title="Rename"
                         >
                           ✏️
                         </button>
                         <button
                           onClick={() => setConfirmDelete(document.id)}
-                          className="text-red-500 hover:text-red-700 text-sm leading-none"
+                          className="text-red-500 hover:text-red-700 text-sm leading-none cursor-pointer"
                           title="Delete"
                         >
                           🗑️
@@ -180,13 +180,13 @@ const StoragePanel: React.FC<StoragePanelProps> = ({ onClose }) => {
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setConfirmDelete(null)}
-                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
+                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDeleteDocument(confirmDelete)}
-                className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
               >
                 Delete
               </button>

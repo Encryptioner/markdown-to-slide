@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { ListIcon } from "@phosphor-icons/react";
 import { useApp } from '@/contexts/AppContext';
+import { basePublicPath } from '@/utils/constants';
 
 const Header: React.FC = () => {
   const { setMarkdown, setCurrentSlide } = useApp();
@@ -79,7 +81,7 @@ Start creating your own presentations with **Markdown to Slides**`;
         
       case 'coding':
         try {
-          const response = await fetch('/examples/markdowns/Hands on Coding of Basic Application Tools.md');
+          const response = await fetch(`${basePublicPath}/markdowns/Hands on Coding of Basic Application Tools.md`);
           if (response.ok) {
             exampleContent = await response.text();
           }
@@ -91,13 +93,24 @@ Start creating your own presentations with **Markdown to Slides**`;
         
       case 'automation':
         try {
-          const response = await fetch('/examples/markdowns/Automation of Daily Workflow Presentation.md');
+          const response = await fetch(`${basePublicPath}/markdowns/Automation of Daily Workflow Presentation.md`);
           if (response.ok) {
             exampleContent = await response.text();
           }
         } catch (error) {
           console.error('Failed to load automation example:', error);
           exampleContent = '# Error loading example\n\nFailed to load the workflow automation presentation example.';
+        }
+        break;
+      case 'emoji':
+        try {
+          const response = await fetch(`${basePublicPath}/markdowns/Emoji Testing.md`);
+          if (response.ok) {
+            exampleContent = await response.text();
+          }
+        } catch (error) {
+          console.error('Failed to load emoji example:', error);
+          exampleContent = '# Error loading example\n\nFailed to load the test emoji presentation example.';
         }
         break;
     }
@@ -114,19 +127,30 @@ Start creating your own presentations with **Markdown to Slides**`;
     <header className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">
-            Markdown to Slides
-          </h1>
-          <p className="text-sm text-gray-600">
-            Create professional presentations from Markdown
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="text-2xl">📊</div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">
+                Markdown to Slides
+              </h1>
+              <p className="text-sm text-gray-600">
+                Create professional presentations from Markdown
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={() => document.getElementById('instructions')?.scrollIntoView({ behavior: 'smooth' })}
+            className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline cursor-pointer"
+          >
+            How to use →
+          </button>
         </div>
         
         <div className="hidden md:flex items-center space-x-4">
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded hover:bg-gray-50"
+              className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded hover:bg-gray-50 cursor-pointer"
             >
               📖 Examples
             </button>
@@ -136,24 +160,31 @@ Start creating your own presentations with **Markdown to Slides**`;
                 <div className="py-2">
                   <button
                     onClick={() => loadExample('basic')}
-                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                     type="button"
                   >
                     Basic Presentation
                   </button>
                   <button
                     onClick={() => loadExample('coding')}
-                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                     type="button"
                   >
                     Coding Tools Presentation
                   </button>
                   <button
                     onClick={() => loadExample('automation')}
-                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                     type="button"
                   >
                     Workflow Automation
+                  </button>
+                  <button
+                    onClick={() => loadExample('emoji')}
+                    className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
+                    type="button"
+                  >
+                    Emoji Testing
                   </button>
                 </div>
               </div>
@@ -164,7 +195,7 @@ Start creating your own presentations with **Markdown to Slides**`;
             href="https://github.com/Encryptioner/markdown-to-slide"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-2 text-sm text-white bg-gray-900 rounded hover:bg-gray-800"
+            className="px-3 py-2 text-sm text-white bg-gray-900 rounded hover:bg-gray-800 cursor-pointer"
           >
             ⭐ Star on GitHub
           </a>
@@ -173,12 +204,12 @@ Start creating your own presentations with **Markdown to Slides**`;
         <div className="md:hidden relative" ref={mobileMenuRef}>
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
+            className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded cursor-pointer"
             type="button"
             aria-label="Toggle menu"
             aria-expanded={showMenu}
           >
-            <span className="text-lg font-bold">☰</span>
+            <ListIcon className="size-6" />
           </button>
           
           {showMenu && (
@@ -189,24 +220,31 @@ Start creating your own presentations with **Markdown to Slides**`;
                 </div>
                 <button
                   onClick={() => loadExample('basic')}
-                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                   type="button"
                 >
                   Basic Presentation
                 </button>
                 <button
                   onClick={() => loadExample('coding')}
-                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                   type="button"
                 >
                   Coding Tools Presentation
                 </button>
                 <button
                   onClick={() => loadExample('automation')}
-                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors"
+                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
                   type="button"
                 >
                   Workflow Automation
+                </button>
+                <button
+                  onClick={() => loadExample('emoji')}
+                  className="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors cursor-pointer"
+                  type="button"
+                >
+                  Emoji Testing
                 </button>
                 <div className="border-t border-gray-100 mt-2 pt-2">
                   <a

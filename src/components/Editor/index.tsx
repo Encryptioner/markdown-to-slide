@@ -188,7 +188,7 @@ const Editor: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col border-r lg:border-r border-b lg:border-b-0 border-gray-200 bg-white">
+    <div className="w-full h-full flex flex-col bg-white border border-gray-200">
       <Toolbar
         onSave={handleSave}
         onToggleStorage={() => setShowStorage(!showStorage)}
@@ -266,14 +266,14 @@ This slide has a red background!"
             <div className="flex flex-col sm:flex-row gap-3 justify-end">
               <button
                 onClick={() => setShowSaveDialog(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors order-2 sm:order-1"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors cursor-pointer order-2 sm:order-1"
                 type="button"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmSave}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors order-1 sm:order-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors cursor-pointer order-1 sm:order-2"
                 type="button"
               >
                 Save

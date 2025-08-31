@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AppProvider } from "@/contexts/AppContext";
+import { basePublicPath } from "@/utils/constants";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -38,9 +39,9 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
         <meta name="author" content="Ankur Mursalin" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
+        <link rel="apple-touch-icon" href={`${basePublicPath}/icons/icon-192x192.svg`} />
       </head>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning={true}>
         <AppProvider>
           {children}
         </AppProvider>
@@ -49,7 +50,7 @@ export default function RootLayout({
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
+                  navigator.serviceWorker.register('${basePublicPath}/sw.js')
                     .then(function(registration) {
                       console.log('SW registered: ', registration);
                     }, function(registrationError) {

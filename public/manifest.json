@@ -1,6 +1,6 @@
 {
   "name": "Markdown to Slides",
-  "short_name": "MD2Slides",
+  "short_name": "MD To Slides",
   "description": "Transform your Markdown content into professional presentation slides",
   "start_url": "/",
   "display": "standalone",
@@ -18,7 +18,11 @@
       "type": "image/svg+xml"
     }
   ],
-  "categories": ["productivity", "business", "education"],
+  "categories": [
+    "productivity",
+    "business",
+    "education"
+  ],
   "orientation": "landscape-primary",
   "scope": "/",
   "lang": "en"

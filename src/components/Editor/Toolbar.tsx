@@ -38,12 +38,12 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
   return (
     <div className="flex items-center justify-between p-3 bg-gray-50 border-b border-gray-200">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 overflow-x-auto">
         {tools.map((tool, index) => (
           <button
             key={index}
             onClick={tool.action}
-            className={`px-3 py-1 text-sm rounded hover:bg-gray-200 transition-colors ${tool.className || ''}`}
+            className={`px-2 md:px-3 py-1 text-xs md:text-sm rounded hover:bg-gray-200 transition-colors whitespace-nowrap cursor-pointer ${tool.className || ''}`}
             title={tool.title}
           >
             {tool.label}
@@ -51,13 +51,13 @@ const Toolbar: React.FC<ToolbarProps> = ({
         ))}
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
         {onUndo && (
           <button
             onClick={onUndo}
             disabled={!canUndo}
-            className={`px-3 py-1 text-sm rounded transition-colors ${
-              canUndo ? 'hover:bg-gray-200' : 'opacity-50 cursor-not-allowed'
+            className={`px-2 md:px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+              canUndo ? 'hover:bg-gray-200 cursor-pointer' : 'opacity-50 cursor-not-allowed'
             }`}
             title="Undo (Ctrl+Z)"
           >
@@ -69,8 +69,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
           <button
             onClick={onRedo}
             disabled={!canRedo}
-            className={`px-3 py-1 text-sm rounded transition-colors ${
-              canRedo ? 'hover:bg-gray-200' : 'opacity-50 cursor-not-allowed'
+            className={`px-2 md:px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+              canRedo ? 'hover:bg-gray-200 cursor-pointer' : 'opacity-50 cursor-not-allowed'
             }`}
             title="Redo (Ctrl+Y)"
           >
@@ -82,20 +82,22 @@ const Toolbar: React.FC<ToolbarProps> = ({
         
         <button
           onClick={onToggleStorage}
-          className={`px-3 py-1 text-sm rounded transition-colors ${
+          className={`px-2 md:px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
             showStorage ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-200'
           }`}
           title="Toggle Storage Panel"
         >
-          📁 Files
+          <span className="hidden sm:inline">📁 Files</span>
+          <span className="sm:hidden">📁</span>
         </button>
         
         <button
           onClick={onSave}
-          className="px-4 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          className="px-2 md:px-4 py-1 text-xs md:text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
           title="Save (Ctrl+S)"
         >
-          💾 Save
+          <span className="hidden sm:inline">💾 Save</span>
+          <span className="sm:hidden">💾</span>
         </button>
       </div>
     </div>

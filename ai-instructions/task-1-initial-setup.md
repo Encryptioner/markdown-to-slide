@@ -1,7 +1,8 @@
 # Task 1: Initial Setup - Instructions
 
 ## General Rules
-1. Assess summary of your earlier tasks in `ai-summaries/task-1-initial-setup.md` file. And write or update the summary of your updates in that file when all the current commanded tasks/instructions are done. Keep it short. Include summary of key files changed (with info on functionality changed). You may update it in chronological way by step 1, step 2 and so on. It should reflect the continuos changes done on the codebase.
+1. Assess summary of your earlier tasks in `ai-summaries/task-1-initial-setup.md` file if you haven't already. And write or update the summary of your updates in that file when all the current commanded tasks/instructions are done. Keep it short, concise, to-the-point. Include summary of key files changed (with info on functionality changed). You may update it in chronological way by step 1, step 2 and so on. It should reflect the continuos changes done on the codebase.
+2. If the instruction lists are not chronological, fix them
 
 
 ## Instruction List 1
@@ -23,7 +24,7 @@
 1. Added this command in middle `Always use pnpm for this project. Update wherever npm is mentioned` when asked to run `npm` command
 
 
-## Instruction List
+## Instruction List 3
 
 ### Instructions
 1. Got this error while running `pnpm dev`. In browser, it is `Runtime error - self is not defined`
@@ -55,7 +56,7 @@
 1. It fixed some issue. But there is more issue
 
 
-## Instruction List 3
+## Instruction List 4
 
 ### Instructions
 1. There is error related to `document.exitFullscreen?.();`
@@ -68,7 +69,7 @@
 1. I don't see any reasonable improvement
 
 
-## Instruction List 4
+## Instruction List 5
 
 ### Instructions
 1. I don't see any color related update. Check earlier instructions and ensure everything is done
@@ -116,7 +117,7 @@
 7. The `PDF` button still don't show the pdf with the content same as preview. It just shows blank pages. The pdf should be exported in a way that, it can later be used in other pdf/slide viewer to easily show as presentation
 
 
-## Instruction List 5
+## Instruction List 6
 
 ### Instructions
 1. Continue your earlier tasks
@@ -127,7 +128,7 @@
 2. On running `pnpm dev`, getting this error `Cannot access 'refreshDocuments' before initialization`
 
 
-## Instruction List 6
+## Instruction List 7
 
 ### Instructions
 1. The pdf export still doesn't work. It just downloads 1 blank page. There is no content where the slide was 2 page long. Fix this. Ensure, one can download an presentable version of pdf
@@ -138,7 +139,7 @@
 1. Reached limit middle of this. Instructed `continue` after limit reset
 
 
-## Instruction List 7
+## Instruction List 8
 
 ### Instructions
 1. The pdf export still exporting empty page. Let's work on it step by step. First, we should try to export the pdf by using slide viewer, not while full screen. When pdf is clicked, go thorough each page of slide in slide viewer and make page for each of them. Then join them to make one single pdf which can be exported.
@@ -150,3 +151,205 @@
 ### Comments
 1. The pdf export issue is still not solved. May need other approach to solve this
 2. Other issue needs to be checked
+
+
+## Instruction List 9
+
+### Instructions
+1. The UI issue is not solved. Refine the design and ensure it works for all screen. I've added some screenshots. Check images which name starts with `after_instruction_list_7` in `screenshots/tasks` directory
+2. The examples doesn't load correctly. Specifically the example markdown files. That should be fixed
+3. Add some marketing info, add instructions sections, add Q&A, FAQ sections. However, those should be expandable and closable. So, it doesn't take much space unnecessarily. Ensure a cleaner modern look. Revamp the design if necessary.
+4. The pdf export still doesn't work. It shows generating PDF. However the generated PDF is an empty page. I have given screenshot in `after_instruction_list_7_3.png` file. Ensure this issue is fixed
+5. Ensure the website is modern, minimal, production ready with maintainable codebase 
+
+### Comments
+1. It broke some design but added some things
+
+
+## Instruction List 10
+
+### Instructions
+1. Remove the `FAQ` Section
+2. In desktop view, the design for markdown editor seems broke. It doesn't take same height as the presentation slide. The markdown editor should take same left space similar to slide preview
+3. Recheck design. If necessary rethought the design. Ensure it is minimal but attractive and must work on all screen size.
+4. For pdf export, check online if necessary. Find the best option. If getting pdf from html is having problem, let's use some package to create html to image. Then use that image to create PDF.
+5. The PDF button in full screen mode should be more understandable. U may use PDF icon/text there.
+6. Ensure the pdf export works for both slide preview and full screen preview. Try ur best. Think, research, then implement. Be concise.
+
+### Comments
+1. Kind of working version
+2. I've updated some part though
+
+
+## Instruction List 11
+
+### Instructions
+1. In desktop, there is border for slide part. But not in markdown part. So, it looks odd. Keep border for both of them
+2. Sometimes this error shows in console. It generates from <body className="antialiased"> data-new-gr-c-s-check-loaded="14.1251.0"
+  A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+3. In top of the page, add some logo and some minimal text. So, user can understand the concept. Also add a small text/button which will send to `How to use` section
+4. Also add blog icon in footer
+5.  `Files & Save` button seems having issue in mid size screen. Ensure it works ok for all size
+
+### Comments
+1. The implementation is mostly ok
+2. I've installed and added phosphorus icon
+
+
+## Instruction List 12
+
+### Instructions
+1. In `html -> image -> PDF` technique, the links of the slide couldn't be accessed. Also, the text couldn't be copied. Are there any other way, which will work? Which will generate pdf and also allow copying text, clicking image
+2. If the slide is long, we need it to scale down to fit in the pdf page. So, no text gets cut/removed
+
+### Comments
+1. Got Error while export
+
+
+## Instruction List 13
+
+### Instructions
+1. When generating PDF, got this error. Please fix errors and ensure the export works smoothly.
+   Failed to export PDF: Cannot read properties of undefined (reading 'vfs'). Please try again.
+   In console: hook.js:608 PDF export failed: TypeError: Cannot read properties of undefined (reading 'vfs') at exportToPDF (index.tsx:275:56)
+
+### Comments
+1. This error is fixed. But there is new error
+
+
+## Instruction List 14
+
+### Instructions
+1. hen generating PDF, got this error in console. Please fix errors and ensure the export works smoothly.
+   fontProvider.js:52 Uncaught (in promise) Error: Font 'Helvetica' in style 'bold' is not defined in the font section of the document definition.
+    at FontProvider.provideFont (fontProvider.js:52:1)
+
+### Comments
+1. The issue is still present
+
+
+## Instruction List 15
+
+### Instructions
+1. The issue didn't go away. It must be fixed for production ready development
+
+### Comments
+1. The error is gone. However, the content is not up to the mark.
+2. The lists, codeblock is left aligned where others are center aligned
+3. The links are also not clickable. So that, on click the link will open in new tab of browser
+
+
+## Instruction List 16
+
+### Instructions
+1. Check the comments of earlier instruction list. Fix those issue
+2. Ensure the pdf looks similar to slide preview. Check ui styling for the slide preview and apply those for PDF.
+
+### Comments
+1. Links are now clickable. However, there are other issue
+
+
+## Instruction List 17
+
+### Instructions
+1. I've added screenshots of exported PDF page here in files starts with `after_instruction_list_16` in `screenshots/task-1` folder. You will see the UI looks odd.
+2. It should look good. Every line of code shouldn't be centered. but it's container will be centered. The lists, should be in centered. The numbers and text of the list should not break
+3. The exported pdf design should match with the preview in full screen view
+4. Ensure the slide show and exported pdf supports all languages, not only english
+5. In mobile view, the slide show height is fixed in a way that, the full content is not visible. It should always be visible
+6. In full screen view, the background is black and the text is white. If the implementation auto detects browser theme and decides the color then it is ok. If not, it should auto detect browser theme and the foreground and background color should change according to light and dark theme. In full screen view, there could have a button to switch between light and dark theme.
+
+### Comments
+1. Aligning issue in PDF is not resolved
+2. Theme styling seems half baked
+
+
+## Instruction List 18
+
+### Instructions
+1. We are close. But the remaining issues are holding us back. They must need to be fixed. Think thoroughly. Research if necessary and plan carefully for no bug implementation. 
+2. Theme switching works. However, the buttons doesn't look ok in full screen. They are not clear, doesn't show icons and doesn't switch color correctly according to icons
+3. The aligning issue in pdf export is not fixed. Check the styling in full screen view on presentation mode. Then apply similar style on exported PDF. Ensure presentable PDF generation.
+
+### Comments
+1. Button in theme issue is solved. Other issue is not
+
+
+## Instruction List 19
+
+### Instructions
+1. In mobile view, the editor height is surprisingly too low. There is blank space after that
+2. In PDF, The alignment got slightly better. However, in lists, the bullet points and numbers are not on the same line of texts. But aligned left. Where the the text are centered
+3. The coding still doesn't looks ok. They are left aligned. Note that, the code as a block must be centred of page. But each line of it, don't need to be centered, but aligned left of coding block
+4. In presentation full screen, when dark mode is selected and pdf export is done, it should export the the file and it's content according to light theme. Dark theme is for presentation view only.
+5. In presentation view, after pdf export, it should be kept in it's original selected theme design
+
+### Comments
+1. Some issues are still not fixed
+
+
+## Instruction List 20
+
+### Instructions
+1. This is not fixed. Here by editor, I meant the text area. It must be Fixed - In mobile view, the editor height is surprisingly too low. There is blank space after that
+2. Let's not show the bullet points in pdf export. They are continuously left aligned. In slide presentation those are also not showed
+3. Good work on handling code. However, on thing, the code as a block is not centered as page yet
+4. Also, can the emojis show correctly in exported pdf?
+
+### Comments
+1. Slightly better. Need improvement
+
+
+## Instruction List 21
+
+### Instructions
+1. You are updating the editor. The problem is in mobile view the text area of editor is not taking full available height. There is blank space after that. I tried adding `h-full max-content` etc. but it did not worked. It need to be fixed
+2. The emoji's still doesn't show correctly. It shows, there is a x type block
+3. The bold texts are not shown correctly. Ensure the bold and styling follows markdown. So, user can get correct view.
+4. The coding block is now centered, but it's width is fixed. Can it be variable according to the width of the content. So, there is not too much unnecessary blank space at right of coding block
+5. There is eslint error in `PDF Export -> index.tsc` . Seems like type error. And there is unused variable like `isFullscreenTheme`. If unnecessary, remove it
+
+### Comments
+1. The text area height issue is still present
+2. The eslint and pdf issue is not fixed
+
+
+## Instruction List 22
+
+### Instructions
+1. Shorten the `ai-summaries/task-1-initial-setup.md`. Keep only the necessary points. The steps are ok. however, final summary seems too long.
+2. The height issue in text area is not fixed. Think like an expert frontend developer to solve this
+3. In pdf, The coding block is not takes proper internal steps. However, the block itself is not centered now. You must fix it
+4. The emojis's still don't show in exported pdf. ensure it works.
+5. The eslint issue is still present. Fix those. There is error like
+   Conversion of type '{ table: { widths: string[]; body: { text: string; style: string; preserveLeadingSpaces: true; alignment: "left"; }[][]; }; layout: { fillColor: () => string; paddingLeft: () => number; paddingRight: () => number; paddingTop: () => number; paddingBottom: () => number; hLineWidth: () => number; vLineWidth: () => numb...' to type 'ContentTable' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'layout' are incompatible.
+    Type '{ fillColor: () => string; paddingLeft: () => number; paddingRight: () 
+  
+  And
+  Object literal may only specify known properties, and 'preserveLeadingSpaces' does
+
+### Comments
+1. Had fixed something, but missed or didn't touched many tasks
+2. It is getting dumb. I started new session though.
+3. Will fix something on my own. Will also add some individual commands.
+4. Own fixes:
+   - Editor height issue in mobile
+   - Increased margin in coding block in pdf export
+   - Tried to use imported fonts for emoji in pdf export. However, it didn't worked
+5. Commands:
+   - Shorten the full @ai-summaries/task-1-initial-setup.md Keep only the necessary points. The steps are ok. however, final summary seems too long. Read the full page and make it short, concise, to-the-point
+   - It became too short. I need the key file info and others. Just remove the redundant part. Each steps seems making 4 segements. make two segment.And don't squeeze multiple steps together
+   - Handle the backtick `` for texts similar to markdown. So that looks special in pdf
+   - Discarding the changes. It makes break current styling. It is not that important. So, skipping it
+   - Fix emoji issue. Here is some suggestion.
+       1. Use a Unicode-Friendly Font:
+       Ensure your document uses a font that fully supports color emojis, such as Noto Color Emoji, and then embed that font into your PDF. 
+       2. Embed Fonts:
+       When exporting to PDF, look for an option to embed fonts. This ensures the font, including its emoji characters, is included in the PDF file.
+       3. Use Unicode Escape Codes:
+       For text-based documents, use the character's Unicode escape code (e.g., =CHAR(128522) for a smiley) instead of copy-pasting an emoji directly, as PDFs often render these more reliably
+   - Got error like below while exporting pdf. Ensure all the fonts are present
+    (index):1 Uncaught (in promise) File 'data/Helvetica.afm' not found in virtual file system
+   - The emoji still doesn't show. It shows some X type design. In some place it shows [PC] after X type txt.
+   - [It used text alternative instead of emoji. Said I want to show the emojis]
