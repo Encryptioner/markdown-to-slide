@@ -5,7 +5,6 @@ import { useApp } from '@/contexts/AppContext';
 
 interface PDFExportProps {
   onClose?: () => void;
-  isFullscreenTheme?: boolean;
 }
 
 // Define types for pdfmake content
@@ -47,7 +46,15 @@ interface ContentTable {
     widths: string[];
     body: ContentText[][];
   };
-  layout: string;
+  layout: {
+    fillColor: () => string;
+    paddingLeft: () => number;
+    paddingRight: () => number;
+    paddingTop: () => number;
+    paddingBottom: () => number;
+    hLineWidth: () => number;
+    vLineWidth: () => number;
+  };
   alignment: 'left' | 'center' | 'right';
   margin?: [number, number, number, number];
 }
@@ -85,10 +92,53 @@ interface DocumentDefinition {
   };
 }
 
-const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = false }) => {
+const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
   const { slides, currentDocument } = useApp();
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
+
+  // Helper function to handle emoji encoding for PDF
+  const handleEmojiText = (text: string): string => {
+    // Enhanced emoji handling with fallback mapping
+    const emojiMap: Record<string, string> = {
+      '👍': '👍',
+      '❤️': '♥',
+      '😊': '😊',
+      '🎉': '★',
+      '✅': '✓',
+      '❌': '✗',
+      '⭐': '★',
+      '🔥': '★',
+      '💡': '!',
+      '📝': '※',
+      '🚀': '^',
+      '💻': '[PC]',
+      '📱': '[Mobile]',
+      '🌟': '★',
+      '💼': '[Work]',
+      '🎯': '[Target]',
+      '📊': '[Chart]'
+    };
+    
+    let result = text;
+    
+    // Replace specific emojis with alternatives
+    Object.entries(emojiMap).forEach(([emoji, replacement]) => {
+      result = result.replace(new RegExp(emoji, 'g'), replacement);
+    });
+    
+    // Replace remaining complex emojis with simple alternatives
+    result = result
+      .replace(/[\u{1F600}-\u{1F64F}]/gu, '😊') // Emoticons -> generic smile
+      .replace(/[\u{1F300}-\u{1F5FF}]/gu, '★') // Symbols -> star
+      .replace(/[\u{1F680}-\u{1F6FF}]/gu, '^') // Transport -> arrow
+      .replace(/[\u{2600}-\u{26FF}]/gu, '★') // Misc symbols -> star
+      .replace(/[\u{2700}-\u{27BF}]/gu, '★') // Dingbats -> star
+      // Ensure proper normalization
+      .normalize('NFC');
+    
+    return result;
+  };
 
   // Helper function to convert HTML to pdfMake content
   const convertHtmlToPdfMake = (htmlString: string): Content[] => {
@@ -99,7 +149,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = fa
     const processNode = (node: Node): Content | Content[] | null => {
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent?.trim();
-        return text ? { text, style: 'normal' } as ContentText : null;
+        return text ? { text: handleEmojiText(text), style: 'normal' } as ContentText : null;
       }
       
       if (node.nodeType === Node.ELEMENT_NODE) {
@@ -109,7 +159,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = fa
         switch (tagName) {
           case 'h1':
             return {
-              text: element.textContent || '',
+              text: handleEmojiText(element.textContent || ''),
               style: 'header1',
               margin: [0, 20, 0, 10],
               alignment: 'center'
@@ -117,7 +167,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = fa
             
           case 'h2':
             return {
-              text: element.textContent || '',
+              text: handleEmojiText(element.textContent || ''),
               style: 'header2',
               margin: [0, 15, 0, 8],
               alignment: 'center'
@@ -125,7 +175,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = fa
             
           case 'h3':
             return {
-              text: element.textContent || '',
+              text: handleEmojiText(element.textContent || ''),
               style: 'header3',
               margin: [0, 12, 0, 6],
               alignment: 'center'
@@ -140,7 +190,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = fa
               }
             });
             return {
-              text: pContent.length > 0 ? pContent : element.textContent || '',
+              text: pContent.length > 0 ? pContent : handleEmojiText(element.textContent || ''),
               style: 'paragraph',
               margin: [0, 5, 0, 5],
               alignment: 'center'
@@ -150,7 +200,7 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = fa
             const href = element.getAttribute('href');
             if (href) {
               return {
-                text: element.textContent || href,
+                text: handleEmojiText(element.textContent || href),
                 link: href,
                 style: 'link'
               } as ContentText;
@@ -162,34 +212,28 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = fa
             Array.from(element.children).forEach(li => {
               if (li.tagName.toLowerCase() === 'li') {
                 ulItems.push({
-                  text: li.textContent || '',
-                  style: 'listItem'
+                  text: handleEmojiText(li.textContent || ''),
+                  style: 'paragraph',
+                  margin: [0, 5, 0, 5],
+                  alignment: 'center'
                 });
               }
             });
-            return {
-              ul: ulItems,
-              style: 'list',
-              margin: [0, 10, 0, 10],
-              alignment: 'center'
-            } as ContentList;
+            return ulItems;
             
           case 'ol':
             const olItems: ContentText[] = [];
             Array.from(element.children).forEach(li => {
               if (li.tagName.toLowerCase() === 'li') {
                 olItems.push({
-                  text: li.textContent || '',
-                  style: 'listItem'
+                  text: handleEmojiText(li.textContent || ''),
+                  style: 'paragraph',
+                  margin: [0, 5, 0, 5],
+                  alignment: 'center'
                 });
               }
             });
-            return {
-              ol: olItems,
-              style: 'list',
-              margin: [0, 10, 0, 10],
-              alignment: 'center'
-            } as ContentList;
+            return olItems;
             
           case 'code':
             const isInPre = element.closest('pre');
@@ -200,10 +244,10 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = fa
             
           case 'pre':
             const codeContent = element.querySelector('code')?.textContent || element.textContent || '';
-            // Create a centered wrapper with left-aligned code content
+            // Create a centered wrapper with left-aligned code content using proper table structure
             return {
               table: {
-                widths: ['auto'],
+                widths: ['*'],
                 body: [[
                   {
                     text: codeContent,
@@ -217,28 +261,29 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose, isFullscreenTheme = fa
                 fillColor: () => '#1e293b',
                 paddingLeft: () => 15,
                 paddingRight: () => 15,
-                paddingTop: () => 10,
-                paddingBottom: () => 10,
+                paddingTop: () => 12,
+                paddingBottom: () => 12,
                 hLineWidth: () => 0,
                 vLineWidth: () => 0
               },
               alignment: 'center',
-              margin: [50, 15, 50, 15]
+              margin: [80, 15, 80, 15]
             } as ContentTable;
             
           case 'strong':
           case 'b':
             return {
-              text: element.textContent || '',
-              fontSize: 13,
-              color: '#1f2937'
+              text: handleEmojiText(element.textContent || ''),
+              bold: true,
+              style: 'normal'
             } as ContentText;
             
           case 'em':
           case 'i':
             return {
-              text: element.textContent || '',
-              italics: true
+              text: handleEmojiText(element.textContent || ''),
+              italics: true,
+              style: 'normal'
             } as ContentText;
             
           case 'br':

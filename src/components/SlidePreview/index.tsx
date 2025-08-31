@@ -181,7 +181,6 @@ const SlidePreview: React.FC = () => {
       {showPDFExport && (
         <PDFExporter 
           onClose={() => setShowPDFExport(false)} 
-          isFullscreenTheme={isFullscreen ? isDarkTheme : false}
         />
       )}
     </div>

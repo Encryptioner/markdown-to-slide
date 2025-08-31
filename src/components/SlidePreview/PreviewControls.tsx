@@ -73,7 +73,6 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({
       {showPDFExport && (
         <PDFExporter 
           onClose={() => setShowPDFExport(false)} 
-          isFullscreenTheme={false}
         />
       )}
     </>

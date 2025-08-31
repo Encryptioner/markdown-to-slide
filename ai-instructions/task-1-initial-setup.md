@@ -291,6 +291,50 @@
 ## Instruction List 20
 
 ### Instructions
-1. This is not fixed. It must be - In mobile view, the editor height is surprisingly too low. There is blank space after that
+1. This is not fixed. Here by editor, I meant the text area. It must be Fixed - In mobile view, the editor height is surprisingly too low. There is blank space after that
 2. Let's not show the bullet points in pdf export. They are continuously left aligned. In slide presentation those are also not showed
 3. Good work on handling code. However, on thing, the code as a block is not centered as page yet
+4. Also, can the emojis show correctly in exported pdf?
+
+### Comments
+1. Slightly better. Need improvement
+
+
+## Instruction List 21
+
+### Instructions
+1. You are updating the editor. The problem is in mobile view the text area of editor is not taking full available height. There is blank space after that. I tried adding `h-full max-content` etc. but it did not worked. It need to be fixed
+2. The emoji's still doesn't show correctly. It shows, there is a x type block
+3. The bold texts are not shown correctly. Ensure the bold and styling follows markdown. So, user can get correct view.
+4. The coding block is now centered, but it's width is fixed. Can it be variable according to the width of the content. So, there is not too much unnecessary blank space at right of coding block
+5. There is eslint error in `PDF Export -> index.tsc` . Seems like type error. And there is unused variable like `isFullscreenTheme`. If unnecessary, remove it
+
+### Comments
+1. The text area height issue is still present
+2. The eslint and pdf issue is not fixed
+
+
+## Instruction List 22
+
+### Instructions
+1. Shorten the `ai-summaries/task-1-initial-setup.md`. Keep only the necessary points. The steps are ok. however, final summary seems too long.
+2. The height issue in text area is not fixed. Think like an expert frontend developer to solve this
+3. In pdf, The coding block is not takes proper internal steps. However, the block itself is not centered now. You must fix it
+4. The emojis's still don't show in exported pdf. ensure it works.
+5. The eslint issue is still present. Fix those. There is error like
+   Conversion of type '{ table: { widths: string[]; body: { text: string; style: string; preserveLeadingSpaces: true; alignment: "left"; }[][]; }; layout: { fillColor: () => string; paddingLeft: () => number; paddingRight: () => number; paddingTop: () => number; paddingBottom: () => number; hLineWidth: () => number; vLineWidth: () => numb...' to type 'ContentTable' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'layout' are incompatible.
+    Type '{ fillColor: () => string; paddingLeft: () => number; paddingRight: () 
+  
+  And
+  Object literal may only specify known properties, and 'preserveLeadingSpaces' does
+
+### Comments
+1. Had fixed something, but missed or didn't touched many tasks
+2. It is getting dumb. I started new session though.
+3. Will fix something on my own. Will also add some individual commands.
+4. Own fixes:
+   - Editor height issue in mobile
+5. Commands:
+   - Shorten the full @ai-summaries/task-1-initial-setup.md Keep only the necessary points. The steps are ok. however, final summary seems too long. Read the full page and make it short, concise, to-the-point
+   - It became too short. I need the key file info and others. Just remove the redundant part. Each steps seems making 4 segements. make two segment.And don't squeeze multiple steps togethere 
