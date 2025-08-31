@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ListIcon } from "@phosphor-icons/react";
 import { useApp } from '@/contexts/AppContext';
+import { basePublicPath } from '@/utils/constants';
 
 const Header: React.FC = () => {
   const { setMarkdown, setCurrentSlide } = useApp();
@@ -80,7 +81,7 @@ Start creating your own presentations with **Markdown to Slides**`;
         
       case 'coding':
         try {
-          const response = await fetch('/markdowns/Hands on Coding of Basic Application Tools.md');
+          const response = await fetch(`${basePublicPath}/markdowns/Hands on Coding of Basic Application Tools.md`);
           if (response.ok) {
             exampleContent = await response.text();
           }
@@ -92,7 +93,7 @@ Start creating your own presentations with **Markdown to Slides**`;
         
       case 'automation':
         try {
-          const response = await fetch('/markdowns/Automation of Daily Workflow Presentation.md');
+          const response = await fetch(`${basePublicPath}/markdowns/Automation of Daily Workflow Presentation.md`);
           if (response.ok) {
             exampleContent = await response.text();
           }
