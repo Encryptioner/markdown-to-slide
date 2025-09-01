@@ -61,11 +61,37 @@ export default function RootLayout({
             `,
           }}
         />
-        {AI_CHAT_CONFIG.enabled && AI_CHAT_CONFIG.isValidUrl(AI_CHAT_CONFIG.embedScriptUrl) && (
+        {AI_CHAT_CONFIG.enabled && (
           <script
-            id="aiChatEmbedScript"
-            defer={true}
-            src={AI_CHAT_CONFIG.embedScriptUrl}
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  try {
+                    // Dynamic loading to handle GitHub Pages better
+                    const embedUrl = ${JSON.stringify(AI_CHAT_CONFIG.embedScriptUrl)};
+                    console.log('Loading AI Chat embed script:', embedUrl);
+                    
+                    if (embedUrl && embedUrl.trim() !== '') {
+                      const script = document.createElement('script');
+                      script.id = 'aiChatEmbedScript';
+                      script.defer = true;
+                      script.src = embedUrl;
+                      script.onerror = function() {
+                        console.error('Failed to load AI Chat embed script:', embedUrl);
+                      };
+                      script.onload = function() {
+                        console.log('AI Chat embed script loaded successfully');
+                      };
+                      document.head.appendChild(script);
+                    } else {
+                      console.warn('AI Chat embed script URL is empty or invalid');
+                    }
+                  } catch (error) {
+                    console.error('Error loading AI Chat embed script:', error);
+                  }
+                })();
+              `,
+            }}
           />
         )}
       </body>
