@@ -12,6 +12,7 @@ A modern, browser-based web application that transforms Markdown content into pr
 - **⚡ PWA Support** - Install as an app, works offline
 - **🎨 Custom Backgrounds** - Support for colors, images, and videos
 - **⌨️ Keyboard Shortcuts** - Efficient workflow with shortcuts
+- **🤖 AI Chat Integration** - Built-in AI assistant for help and suggestions
 
 ## 🚀 Quick Start
 
@@ -114,6 +115,39 @@ Add custom styling with HTML comments:
 - **Arrow Keys** - Navigate slides (in presentation mode)
 - **Esc** - Exit fullscreen mode
 - **Home/End** - Jump to first/last slide
+
+### AI Chat Assistant
+
+The app includes an integrated AI chat assistant that runs entirely in your browser:
+
+- **Floating Chat Button** - Available in the bottom-right corner
+- **Privacy-First** - All AI processing happens locally, no data sent to servers
+- **Offline Capable** - Works without internet connection after initial setup
+- **Presentation Help** - Get suggestions for improving your slides
+
+#### Configuration
+
+The AI chat feature can be configured in `src/utils/constants.ts`:
+
+```typescript
+export const AI_CHAT_CONFIG = {
+  // Set to empty string to disable chat functionality
+  embedScriptUrl: 'https://username.github.io/in-browser-llm-inference/embed.js',
+  enabled: true, // Set to false to completely disable chat widget
+}
+```
+
+**To disable the chat widget:**
+1. Set `enabled: false` in `AI_CHAT_CONFIG`
+2. Or set `embedScriptUrl` to an empty string
+
+#### How It Works
+
+The AI chat integration uses an embed script that:
+- Loads a local language model in an iframe
+- Provides a floating chat interface
+- Processes all conversations locally in the browser
+- Caches models for offline use
 
 ## 🧪 Available Scripts
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AppProvider } from "@/contexts/AppContext";
-import { basePublicPath } from "@/utils/constants";
+import { basePublicPath, AI_CHAT_CONFIG } from "@/utils/constants";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -61,6 +61,13 @@ export default function RootLayout({
             `,
           }}
         />
+        {AI_CHAT_CONFIG.enabled && AI_CHAT_CONFIG.isValidUrl(AI_CHAT_CONFIG.embedScriptUrl) && (
+          <script
+            id="aiChatEmbedScript"
+            defer={true}
+            src={AI_CHAT_CONFIG.embedScriptUrl}
+          />
+        )}
       </body>
     </html>
   );
