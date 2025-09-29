@@ -132,7 +132,7 @@ The AI chat feature can be configured in `src/utils/constants.ts`:
 ```typescript
 export const AI_CHAT_CONFIG = {
   // Set to empty string to disable chat functionality
-  embedScriptUrl: 'https://username.github.io/in-browser-llm-inference/embed.js',
+  embedScriptUrl: 'https://username.github.io/private-chat/embed.js',
   enabled: true, // Set to false to completely disable chat widget
 }
 ```

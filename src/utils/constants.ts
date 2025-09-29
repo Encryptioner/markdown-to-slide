@@ -47,8 +47,6 @@ export const AI_CHAT_BASE_CONFIG = {
     const message = `
       You are a helpful assistant.
       Keep responses as concise as possible.
-      Avoid long explanations.
-      You must reply as poem while giving the answer.
     `.replace(/\n/g, ' ').trim();
     return encodeURIComponent(message);
   }
@@ -58,10 +56,10 @@ export const AI_CHAT_BASE_CONFIG = {
  * NOTE:
  * Set to empty string to disable chat functionality
  * For development: 'http://localhost:5173/embed.js'
- * For production: 'https://username.github.io/in-browser-llm-inference/embed.js'
+ * For production: 'https://username.github.io/private-chat/embed.js'
  */
 const embedScriptMainSrc = isProduction 
-  ? 'https://encryptioner.github.io/in-browser-llm-inference/embed.js' 
+  ? 'https://encryptioner.github.io/private-chat/embed.js' 
   : 'http://localhost:5173/embed.js';
 
 // AI Chat Plugin Configuration
