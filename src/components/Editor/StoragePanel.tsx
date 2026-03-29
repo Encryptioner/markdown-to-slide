@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { trackEvent } from '@/lib/googleAnalytics';
 import { Document } from '@/types';
 
 interface StoragePanelProps {
@@ -20,12 +21,16 @@ const StoragePanel: React.FC<StoragePanelProps> = ({ onClose }) => {
   }, [refreshDocuments]);
 
   const handleLoadDocument = (document: Document) => {
+    // Count slides in the document being loaded (split on ---)
+    const slideCount = document.content.split(/\n---\n/).length;
     loadDocument(document);
+    trackEvent({ name: "presentation_loaded", params: { slide_count: slideCount } });
     onClose();
   };
 
   const handleDeleteDocument = (id: string) => {
     deleteStoredDocument(id);
+    trackEvent({ name: "presentation_deleted" });
     setConfirmDelete(null);
   };
 
@@ -40,9 +45,10 @@ const StoragePanel: React.FC<StoragePanelProps> = ({ onClose }) => {
       setError('Title cannot be empty');
       return;
     }
-    
+
     const success = renameStoredDocument(id, editTitle.trim());
     if (success) {
+      trackEvent({ name: "presentation_renamed" });
       setEditingId(null);
       setEditTitle('');
       setError('');

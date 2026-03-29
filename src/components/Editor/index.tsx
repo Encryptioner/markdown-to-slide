@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { trackEvent } from '@/lib/googleAnalytics';
 import Toolbar from './Toolbar';
 import StoragePanel from './StoragePanel';
 
@@ -14,7 +15,7 @@ interface HistoryState {
 const MAX_HISTORY_SIZE = 50;
 
 const Editor: React.FC = () => {
-  const { markdown, setMarkdown, saveCurrentDocument } = useApp();
+  const { markdown, setMarkdown, saveCurrentDocument, slides } = useApp();
   const [showStorage, setShowStorage] = useState(false);
   const [saveTitle, setSaveTitle] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -22,6 +23,23 @@ const Editor: React.FC = () => {
   const [historyIndex, setHistoryIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const historyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const slideCountDebounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Track slide count changes (debounced 2s to avoid flooding during active typing)
+  useEffect(() => {
+    if (slideCountDebounceRef.current) {
+      clearTimeout(slideCountDebounceRef.current);
+    }
+    slideCountDebounceRef.current = setTimeout(() => {
+      trackEvent({ name: "slide_count_changed", params: { slide_count: slides.length } });
+    }, 2000);
+
+    return () => {
+      if (slideCountDebounceRef.current) {
+        clearTimeout(slideCountDebounceRef.current);
+      }
+    };
+  }, [slides.length]);
 
   const handleSave = () => {
     if (!saveTitle.trim()) {
@@ -34,6 +52,7 @@ const Editor: React.FC = () => {
   const confirmSave = () => {
     if (saveTitle.trim()) {
       saveCurrentDocument(saveTitle.trim());
+      trackEvent({ name: "presentation_saved", params: { slide_count: slides.length } });
       setShowSaveDialog(false);
       setSaveTitle('');
     }
@@ -106,24 +125,32 @@ const Editor: React.FC = () => {
       if (e.key === 's') {
         e.preventDefault();
         handleSave();
+        trackEvent({ name: "keyboard_shortcut_used", params: { shortcut: "save" } });
       } else if (e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
         undo();
+        trackEvent({ name: "keyboard_shortcut_used", params: { shortcut: "undo" } });
+        trackEvent({ name: "history_action", params: { action: "undo" } });
       } else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') {
         e.preventDefault();
         redo();
+        trackEvent({ name: "keyboard_shortcut_used", params: { shortcut: "redo" } });
+        trackEvent({ name: "history_action", params: { action: "redo" } });
       } else if (e.key === 'a') {
         // Allow default select all behavior
         return;
       } else if (e.key === 'b') {
         e.preventDefault();
         insertMarkdownSyntax('**', true);
+        trackEvent({ name: "keyboard_shortcut_used", params: { shortcut: "bold" } });
       } else if (e.key === 'i') {
         e.preventDefault();
         insertMarkdownSyntax('*', true);
+        trackEvent({ name: "keyboard_shortcut_used", params: { shortcut: "italic" } });
       } else if (e.key === 'k') {
         e.preventDefault();
         insertMarkdownSyntax('[]()', false);
+        trackEvent({ name: "keyboard_shortcut_used", params: { shortcut: "link" } });
         const textarea = textareaRef.current;
         if (textarea) {
           setTimeout(() => {
@@ -132,7 +159,7 @@ const Editor: React.FC = () => {
         }
       }
     }
-    
+
     // Tab support for better UX
     if (e.key === 'Tab') {
       e.preventDefault();
