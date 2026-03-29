@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { trackEvent } from '@/lib/googleAnalytics';
 import PDFExporter from '@/components/PDFExporter';
 
 interface PreviewControlsProps {
@@ -29,20 +30,20 @@ const PreviewControls: React.FC<PreviewControlsProps> = ({
       <div className="flex items-center justify-between p-3 bg-gray-50 border-b border-gray-200">
         <div className="flex items-center gap-2">
           <button
-            onClick={onPrev}
+            onClick={() => { onPrev(); trackEvent({ name: "slide_navigated", params: { method: "button", slide_index: currentSlide - 1 } }); }}
             disabled={!canGoPrev}
             className="px-3 py-1 text-sm rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
             title="Previous slide"
           >
             ← Prev
           </button>
-          
+
           <span className="text-sm text-gray-600 min-w-[60px] text-center">
             {currentSlide + 1} / {totalSlides}
           </span>
-          
+
           <button
-            onClick={onNext}
+            onClick={() => { onNext(); trackEvent({ name: "slide_navigated", params: { method: "button", slide_index: currentSlide + 1 } }); }}
             disabled={!canGoNext}
             className="px-3 py-1 text-sm rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
             title="Next slide"

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { trackEvent } from '@/lib/googleAnalytics';
 import { generateSlideStyles } from '@/utils/markdownParser';
 import PreviewControls from './PreviewControls';
 import SlideNavigation from './SlideNavigation';
@@ -11,31 +12,56 @@ const SlidePreview: React.FC = () => {
   const { slides, currentSlide, setCurrentSlide, isFullscreen, setFullscreen } = useApp();
   const [showPDFExport, setShowPDFExport] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
-  
+  // Track the highest slide index reached during fullscreen (for slides_viewed on exit)
+  const maxSlideReachedRef = useRef(currentSlide);
+
   // Theme detection
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     setIsDarkTheme(mediaQuery.matches);
-    
+
     const handleThemeChange = (e: MediaQueryListEvent) => {
       setIsDarkTheme(e.matches);
     };
-    
+
     mediaQuery.addEventListener('change', handleThemeChange);
     return () => mediaQuery.removeEventListener('change', handleThemeChange);
   }, []);
 
   const currentSlideData = slides[currentSlide];
 
+  // Keep track of furthest slide reached during fullscreen
+  useEffect(() => {
+    if (isFullscreen && currentSlide > maxSlideReachedRef.current) {
+      maxSlideReachedRef.current = currentSlide;
+    }
+  }, [currentSlide, isFullscreen]);
+
+  // Reset tracker and fire fullscreen_entered when entering fullscreen
+  const handleEnterFullscreen = React.useCallback(() => {
+    maxSlideReachedRef.current = currentSlide;
+    setFullscreen(true);
+    trackEvent({ name: "fullscreen_entered", params: { slide_count: slides.length } });
+  }, [currentSlide, slides.length, setFullscreen]);
+
+  // Fire fullscreen_exited with slides_viewed when exiting
+  const handleExitFullscreen = React.useCallback(() => {
+    const slidesViewed = maxSlideReachedRef.current + 1; // 1-based count of slides reached
+    setFullscreen(false);
+    trackEvent({ name: "fullscreen_exited", params: { slides_viewed: slidesViewed, total_slides: slides.length } });
+  }, [slides.length, setFullscreen]);
+
   const handlePrevSlide = React.useCallback(() => {
     if (currentSlide > 0) {
       setCurrentSlide(currentSlide - 1);
+      trackEvent({ name: "slide_navigated", params: { method: "button", slide_index: currentSlide - 1 } });
     }
   }, [currentSlide, setCurrentSlide]);
 
   const handleNextSlide = React.useCallback(() => {
     if (currentSlide < slides.length - 1) {
       setCurrentSlide(currentSlide + 1);
+      trackEvent({ name: "slide_navigated", params: { method: "button", slide_index: currentSlide + 1 } });
     }
   }, [currentSlide, slides.length, setCurrentSlide]);
 
@@ -45,29 +71,43 @@ const SlidePreview: React.FC = () => {
         case 'ArrowLeft':
         case 'ArrowUp':
           e.preventDefault();
-          handlePrevSlide();
+          if (currentSlide > 0) {
+            setCurrentSlide(currentSlide - 1);
+            trackEvent({ name: "slide_navigated", params: { method: "arrow_key", slide_index: currentSlide - 1 } });
+          }
           break;
         case 'ArrowRight':
         case 'ArrowDown':
+          e.preventDefault();
+          if (currentSlide < slides.length - 1) {
+            setCurrentSlide(currentSlide + 1);
+            trackEvent({ name: "slide_navigated", params: { method: "arrow_key", slide_index: currentSlide + 1 } });
+          }
+          break;
         case ' ':
           e.preventDefault();
-          handleNextSlide();
+          if (currentSlide < slides.length - 1) {
+            setCurrentSlide(currentSlide + 1);
+            trackEvent({ name: "slide_navigated", params: { method: "spacebar", slide_index: currentSlide + 1 } });
+          }
           break;
         case 'Escape':
           e.preventDefault();
-          setFullscreen(false);
+          handleExitFullscreen();
           break;
         case 'Home':
           e.preventDefault();
           setCurrentSlide(0);
+          trackEvent({ name: "slide_navigated", params: { method: "home_end", slide_index: 0 } });
           break;
         case 'End':
           e.preventDefault();
           setCurrentSlide(slides.length - 1);
+          trackEvent({ name: "slide_navigated", params: { method: "home_end", slide_index: slides.length - 1 } });
           break;
       }
     }
-  }, [slides.length, isFullscreen, setCurrentSlide, setFullscreen, handlePrevSlide, handleNextSlide]);
+  }, [slides.length, currentSlide, isFullscreen, setCurrentSlide, handleExitFullscreen]);
 
   React.useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -90,8 +130,8 @@ const SlidePreview: React.FC = () => {
   return (
     <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-black' : 'w-full h-full border border-gray-200'} flex flex-col`}>
       {!isFullscreen && (
-        <PreviewControls 
-          onFullscreen={() => setFullscreen(true)}
+        <PreviewControls
+          onFullscreen={handleEnterFullscreen}
           onPrev={handlePrevSlide}
           onNext={handleNextSlide}
           currentSlide={currentSlide}
@@ -127,7 +167,11 @@ const SlidePreview: React.FC = () => {
         {isFullscreen && (
           <div className="absolute top-4 right-4 flex gap-2">
             <button
-              onClick={() => setIsDarkTheme(!isDarkTheme)}
+              onClick={() => {
+                const newTheme = !isDarkTheme;
+                setIsDarkTheme(newTheme);
+                trackEvent({ name: "theme_toggled", params: { theme: newTheme ? "dark" : "light" } });
+              }}
               className={`p-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200 cursor-pointer`}
               title="Toggle theme"
             >
@@ -159,8 +203,9 @@ const SlidePreview: React.FC = () => {
             >
               <span className="text-lg">→</span>
             </button>
+
             <button
-              onClick={() => setFullscreen(false)}
+              onClick={handleExitFullscreen}
               className={`p-3 ${isDarkTheme ? 'bg-white bg-opacity-90 text-black border border-gray-300' : 'bg-gray-900 bg-opacity-90 text-white border border-gray-700'} rounded-lg hover:bg-opacity-100 shadow-lg transition-all duration-200 cursor-pointer`}
               title="Exit fullscreen (Esc)"
             >

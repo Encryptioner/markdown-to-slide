@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { trackEvent, sanitizeError } from '@/lib/googleAnalytics';
 import { basePublicPath } from '@/utils/constants';
 
 interface PDFExportProps {
@@ -412,8 +413,10 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
   const exportToPDF = async () => {
     if (slides.length === 0) return;
 
+    const exportStartTime = Date.now();
     setIsExporting(true);
     setExportProgress(0);
+    trackEvent({ name: "pdf_export_started", params: { slide_count: slides.length } });
 
     try {
       // Dynamic import to avoid SSR issues
@@ -663,10 +666,19 @@ const PDFExporter: React.FC<PDFExportProps> = ({ onClose }) => {
       pdfDoc.download(`${currentDocument?.title || 'presentation'}.pdf`);
       
       setExportProgress(100);
-      
+      trackEvent({
+        name: "pdf_export_completed",
+        params: { slide_count: slides.length, duration_ms: Date.now() - exportStartTime },
+      });
+
     } catch (error) {
       console.error('PDF export failed:', error);
-      alert(`Failed to export PDF: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      trackEvent({
+        name: "pdf_export_failed",
+        params: { slide_count: slides.length, error: sanitizeError(errorMessage) },
+      });
+      alert(`Failed to export PDF: ${errorMessage}. Please try again.`);
     } finally {
       setIsExporting(false);
       setExportProgress(0);

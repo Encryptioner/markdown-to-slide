@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ListIcon } from "@phosphor-icons/react";
 import { useApp } from '@/contexts/AppContext';
+import { trackEvent } from '@/lib/googleAnalytics';
 import { basePublicPath } from '@/utils/constants';
 
 const Header: React.FC = () => {
@@ -118,8 +119,9 @@ Start creating your own presentations with **Markdown to Slides**`;
     if (exampleContent) {
       await setMarkdown(exampleContent);
       setCurrentSlide(0); // Reset to first slide
+      trackEvent({ name: "example_loaded", params: { example: exampleName } });
     }
-    
+
     setShowMenu(false);
   };
 
