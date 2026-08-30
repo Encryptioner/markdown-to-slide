@@ -9,7 +9,7 @@
 // ── Configuration ────────────────────────────────────────────
 
 export const GOOGLE_ANALYTICS_CONFIG = {
-  measurementId: 'G-Z7NVT8P8HQ',
+  measurementId: 'G-VZN3VLSRL2E',
   enabled: true,
   trackInDevelopment: false,
 
