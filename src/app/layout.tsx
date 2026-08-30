@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AppProvider } from "@/contexts/AppContext";
 import { basePublicPath, AI_CHAT_CONFIG } from "@/utils/constants";
+import { GOOGLE_ANALYTICS_CONFIG } from "@/lib/googleAnalytics";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -45,6 +46,27 @@ export default function RootLayout({
         <AppProvider>
           {children}
         </AppProvider>
+        {GOOGLE_ANALYTICS_CONFIG.shouldTrack && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_CONFIG.measurementId}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GOOGLE_ANALYTICS_CONFIG.measurementId}', {
+                    page_path: window.location.pathname,
+                  });
+                  console.log('[Google Analytics] Initialized successfully with ID: ${GOOGLE_ANALYTICS_CONFIG.measurementId}');
+                `,
+              }}
+            />
+          </>
+        )}
         <script
           dangerouslySetInnerHTML={{
             __html: `
