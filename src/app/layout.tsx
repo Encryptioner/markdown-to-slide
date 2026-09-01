@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   title: "Markdown to Slides - Create Professional Presentations",
   description: "Transform your Markdown content into professional presentation slides. Free, open-source, and browser-based with offline support.",
   keywords: "markdown, slides, presentation, pwa, offline, free, open-source",
-  authors: [{ name: "Ankur Mursalin", url: "https://encryptioner.github.io/" }],
-  creator: "Ankur Mursalin",
+  authors: [{ name: "Mir Mursalin Ankur", url: "https://encryptioner.github.io/" }],
+  creator: "Mir Mursalin Ankur",
   openGraph: {
     title: "Markdown to Slides",
     description: "Create professional presentations from Markdown",
