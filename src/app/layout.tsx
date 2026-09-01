@@ -39,7 +39,7 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
-        <meta name="author" content="Ankur Mursalin" />
+        <meta name="author" content="Mir Mursalin Ankur" />
         <link rel="apple-touch-icon" href={`${basePublicPath}/icons/icon-192x192.svg`} />
       </head>
       <body className="antialiased" suppressHydrationWarning={true}>
